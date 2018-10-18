@@ -12,7 +12,7 @@ class TestGetProducts(BaseTest):
         "product_name": "Home Theatre",
         "categoty": "Electonics",
         "quantity": 7,
-        "re_order": 3,
+        "reorder_level": 3,
         "price": 7999
     }
 
@@ -24,3 +24,9 @@ class TestGetProducts(BaseTest):
         with self.client():
             response = self.client().get(products_url)
             self.assertEqual(response.status_code, 200)
+
+    def test_single_product(self):
+        """
+        Test endpoint to get a single product
+        """
+        
