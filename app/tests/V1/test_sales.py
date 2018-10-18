@@ -49,7 +49,7 @@ class TestSales(BaseTest):
     def test_get_single_sale(self):
         """Asserts test return true status_code and message"""
         with self.client():
-            res = self.client().post(sales_url, data=json.dumps(dict(
+            self.client().post(sales_url, data=json.dumps(dict(
                 sales_id = 1,
                 product_id = 3,
                 product_name = "Home Theatre",
