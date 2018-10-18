@@ -1,49 +1,64 @@
 from flask import Flask, request, jsonify, Blueprint, json, make_response
-from flask_restful import Resource, reqparse 
-from ..models import product_model
+from flask_restplus import Resource, reqparse, Api, Namespace
+from ..models.product_model import Product
 
-product = Blueprint('product', __name__, url_prefix='/api/v1')
+api = Namespace('Product_endpoints', description='A collection of endpoints for the product model; includes get and post endpoints', 
+path='products/api/v1')
 
-prod = product_model.Product()
+parser = reqparse.RequestParser()
+parser.add_argument('product_id')
+parser.add_argument('product_name')
+parser.add_argument('category')
+parser.add_argument('quantity')
+parser.add_argument('reorder_level')
+parser.add_argument('price')
 
-
-@product.route('/products', methods=['POST'])
-
-def post_product(self):
-    data = request.get_json()
-    if not data:
-        return jsonify({"message": "Please fill in the fields"})
-    product_id = data.get("product_id")
-    product_name = data.get("product_name")
-    category = data.get("category")
-    quantity = data.get("quantity")
-    reorder_level = data.get("reoder_level")
-    price = data.get("price")
-
-    if product_name is None or not product_name:
-        return jsonify({"message": "please enter product name"}), 206
-    elif category is not category:
-        return jsonify({"message": "please select the product's category"}), 206
-    elif quantity is None or not quantity:
-        return jsonify({"message": "please enter product quantity"}), 206
-    elif reorder_level is None or not reorder_level:
-        return jsonify({"message": "please enter product reorder level"}), 206
-    elif price is None or not price:
-        return jsonify({"message": "please enter product price"}), 206
-
-    response =jsonify(prod.create_product(product_id, product_name, category, quantity, reorder_level, price))
-    response.status_code = 201
-    return response
+@api.route('')
+class ProductEndpoint(Resource):
     
-    @product.route('/products', methods=['GET'])
-    def get_all_products(self):
-        response=jsonify(prod.get_all_products())
-        response.status_code = 200
-        return response
+    def post(self):
+        args = parser.parse_args()
+        product_id = args['product_id']
+        product_name = args['product_name']
+        category = args['category']
+        quantity = args['quantity']
+        reoder_level = args['reorder_level']
+        price = args['price']
 
-@product.route('/products/<product_id>', methods=['GET'])
+        new_product = Product(product_id, product_name, category, quantity, reoder_level, price)
+        created_product = new_product.create_product()
+        return make_response(jsonify({
+            'status': 'ok',
+            'message': 'success',
+            'product': created_product
+        }), 201)
+    
+    def get(self):
+        """Get all products"""
+        products = Product.get_all_products(self)
+        return make_response(jsonify({
+            'message':  'success',
+            'status': 'ok',
+            'product': products
+        }), 200)
 
-def get_single_product(self, product_id):
-        response = jsonify(prod.get_single_product(product_id))
-        response.status_code = 200
-        return response
+
+
+@api.route('/<product_id>')
+class GetSingleProduct(Resource):
+    """Get single product"""
+    
+    def get(self, product_id):
+        """Get all products and a specific product when provided with an id"""
+        single_product = Product.get_single_product(self, product_id) 
+        if single_product:
+            return make_response(jsonify({
+                'status': 'ok',
+                'message': 'success',
+                'cart': single_product
+            }), 200)
+        return make_response(jsonify({
+            'status': 'failed',
+            'message': 'not found'
+        }), 404)  
+        

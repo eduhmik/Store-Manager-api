@@ -1,31 +1,41 @@
 """ product model class and various functions"""
-PRODS_DICT = {}
+
 class Product():
+    product_id = 1
+    products = []
     
     """ Initializing the constructor"""
-    def __init__(self):
-        self.products_dict = {}
+    def __init__(self, product_id, product_name, category, quantity, reoder_level, price):
+        self.product_id = len(Product.products) + 1
+        self.product_name = product_name
+        self.category = category
+        self.quantity = quantity
+        self.reorder_level = reoder_level
+        self.price = price
 
-
-    def create_product(self, product_id, product_name, category, quantity, reoder_level, price):
+    def create_product(self):
         """Method to create a new product into list"""
-        self.products_dict["product_id"] = product_id
-        self.products_dict["product_name"] = product_name
-        self.products_dict["category"] = category
-        self.products_dict["quantity"] = quantity
-        self.products_dict["reoder_level"] = reoder_level
-        self.products_dict["price"] = price
-
-        PRODS_DICT[product_id]=self.products_dict
-        return {"message": "Product created successfully"}
-
-    
+        product_item = dict(
+            product_id = self.product_id,
+            product_name = self.product_name,
+            category = self.category,
+            quantity = self.quantity,
+            reoder_level = self.reorder_level,
+            price = self.price
+        )    
+        self.products.append(product_item)
+        return product_item
 
     def get_all_products(self):
         """method to get all the products"""
-        return PRODS_DICT
+        return Product.products
+        
+        
 
     def get_single_product(self, product_id):
-        if product_id in PRODS_DICT:
-            return PRODS_DICT[product_id]
-        return {"message":"product not found"}
+        """Method to get a single product by id"""
+        product_item = [prod for prod in Product.products if prod['product_id'] == product_id]
+        if product_item:
+            return product_item
+        return 'product not found'
+        
