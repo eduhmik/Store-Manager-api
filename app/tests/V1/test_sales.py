@@ -3,7 +3,7 @@ import json
 # Local application imports
 from .base_test import BaseTest
 
-products_url = "/api/v1/sales"
+sales_url = "/api/v1/sales"
 
 class TestSales(BaseTest):
     """
@@ -19,11 +19,11 @@ class TestSales(BaseTest):
 
     def test_post_sales(self):
         """method to test for sales"""
-        with test_client():
-            response = self.client().post(products_url, data= json.dumps(dict(
+        with self.client():
+            response = self.client().post(sales_url, data= json.dumps(dict(
                 sales_id = 1,
                 product_id = 1,
-                product_name = Home Theatre,
+                product_name = 'Home Theatre',
                 quantity = 1,
                 total = 7999,
                 seller = 'john doe'
@@ -32,22 +32,24 @@ class TestSales(BaseTest):
         )
         """Asserts test return true status_code and message"""
         result = json.loads(response.data)
-        self.assertEqual('success', result['message'])
-        self.assertEqual(result.status_code, 201)
+        self.assertEqual('Sale created successfully', result['message'])
+        self.assertEqual(response.status_code, 201)
 
 
 
     def test_get_sales(self):
-        """Asserts test return true status_code and message"""
-        response = self.client().get(products_url)
-        self.assertEqual('success', response['message'])
-        result = json.loads(response.data)
-        self.assertEqual(result.status_code, 200)
+        with self.client():
+            """Asserts test return true status_code and message"""
+            response = self.client().get(sales_url)
+            self.assertEqual(response.status_code, 200)
+            result = json.loads(response.data)
+            self.assertEqual('success', result['message'])
+            
 
     def test_get_single_sale(self):
         """Asserts test return true status_code and message"""
         with self.client():
-            self.client().post(products_url, data=json.dumps(dict(
+            res = self.client().post(sales_url, data=json.dumps(dict(
                 sales_id = 1,
                 product_id = 3,
                 product_name = "Home Theatre",
@@ -57,10 +59,11 @@ class TestSales(BaseTest):
             )),
             content_type='application/json')
 
-            response = self.client().get('/api/v1/sales/3')
+            response = self.client().get('/api/v1/sales/1')
             self.assertEqual(response.status_code, 200)
 
             result = self.client().get('/api/v1/sales/4')
             response = json.loads(result.data)
             self.assertEqual("success", response["message"])
+            
 
