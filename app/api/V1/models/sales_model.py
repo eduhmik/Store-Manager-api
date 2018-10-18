@@ -3,7 +3,7 @@ class Sales():
     sales = []
     """initializing the constructor"""
     def __init__(self, sales_id, product_id, product_name, quantity, total, seller):
-        self.sales_id = sales_id
+        self.sales_id = len(Sales.sales) + 1
         self.product_id = product_id
         self.product_name = product_name
         self.quantity = quantity
