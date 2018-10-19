@@ -3,6 +3,7 @@ from passlib.hash import pbkdf2_sha256 as sha256
 class User():
     user_id = 1
     users = []
+    password = ''
 
     def __init__(self, email, password, username, role, phone):
         self.username = username
@@ -19,13 +20,19 @@ class User():
             role = self.role,
             phone = self.phone
         )
-        self.users.append(user)
+        User.users.append(user)
         return user
+        
+    @staticmethod
+    def get_single_user(email):
+        """Retrieve user details by email"""
 
-    def find_by_email(self, email):
-        found_email = [email for email in User.users if email['email'] == email]
-        return found_email
-    
+        single_user = [user for user in User.users if user['email'] == email]
+        if single_user:
+            return single_user[0]
+        return 'not found'
+
+
     def get_all_users(self):
         return User.users
 
@@ -33,10 +40,12 @@ class User():
         User.users.clear()
         del User.users[:]
 
-    def generate_hash(self, password):
+    @staticmethod
+    def generate_hash(password):
         return sha256.hash(password)
-
-    def verify_hash(self, password, hash):
+        
+    @staticmethod
+    def verify_hash(password, hash):
         return sha256.verify(password, hash)
 
     

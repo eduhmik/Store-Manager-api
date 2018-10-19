@@ -23,30 +23,30 @@ class UserRegistration(Resource):
         role = args['role']
         password = args['password']
 
-        found_email = User.find_by_email(self, email)
-        if found_email:
+        found_email = User.get_single_user(email)
+        if found_email == 'not found':
+        
+            new_user = User(email, User.generate_hash(password), username, role, phone)
+            created_user = new_user.create_user()
+            access_token = create_access_token(identity = args['email'])
+            refresh_token = create_refresh_token(identity = args['email'])
             return make_response(jsonify({
+                'status': 'ok',
+                'message': 'User created successfully',
+                'access_token': access_token,
+                'refresh_token': refresh_token,
+                'users': created_user
+            }), 201)
+        
+        return make_response(jsonify({
                 'message' : 'Email already exists'
             }))
 
-        new_user = User(email, password, username, role, phone)
-        created_user = new_user.create_user()
-        access_token = create_access_token(identity = args['email'])
-        refresh_token = create_refresh_token(identity = args['email'])
-        return make_response(jsonify({
-            'status': 'ok',
-            'message': 'User created successfully',
-            'access_token': access_token,
-            'refresh_token': refresh_token,
-            'sales': created_user
-        }), 201)
-
 
       
 
       
-"""fetch all users""" 
-@api.route('')     
+"""fetch all users"""    
 class AllUsers(Resource):
     def get(self):
         users_list = User.get_all_users(self)
@@ -64,10 +64,4 @@ class AllUsers(Resource):
             'status': 'ok',
             'users': empty_list
         }), 200)
-"""secret resource""" 
-@api.route('')  
-class SecretResource(Resource):
-    def get(self):
-        return {
-            'answer': 42
-}
+

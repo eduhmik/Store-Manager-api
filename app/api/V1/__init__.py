@@ -11,7 +11,7 @@ from .views.logout_endpoints import api as userLogoutAccess_namespace
 from .views.logout_endpoints import api as userLogoutRefresh_namespace 
 from .views.logout_endpoints import api as tokenRefresh_namespace 
 from .views.register_endpoints import api as allUsers_namespace 
-from .views.register_endpoints import api as secretRes_namespace
+
 version1 = Blueprint('api version 1', __name__, url_prefix='/api/v1')
 
 
@@ -29,4 +29,3 @@ api.add_namespace(userLogoutAccess_namespace, path='/logout/access')
 api.add_namespace(userLogoutRefresh_namespace, path='/logout/refresh')
 api.add_namespace(tokenRefresh_namespace, path='/token/refresh')
 api.add_namespace(allUsers_namespace, path='/users')
-api.add_namespace(secretRes_namespace, path='/secret')

@@ -15,25 +15,27 @@ class UserLogin(Resource):
     def post(self):
         args = parser.parse_args()
         email = args['email']
-        
-        current_user = User.find_by_email(self, email)
+        password = args['password']
+                
+        try:
+            current_user = User.get_single_user(email)
+            if current_user and User.verify_hash(password, current_user['password']):    
+                access_token = create_access_token(identity = args['email'])
+                refresh_token = create_refresh_token(identity = args['email'])
+                return make_response(jsonify({
+                    'message' : 'Logged in successfully',
+                    'access_token': access_token,
+                    'refresh_token': refresh_token
+                }))
 
-        if not current_user:
+            else:
+
+                return make_response(jsonify({
+                    'message' : 'Incorrect email or password'
+                }))
+
+        except Exception as e:
             return make_response(jsonify({
-                'message' : 'Email doesn\'t exists'
-            }))
-
-        if args['password'] == current_user.password:    
-            access_token = create_access_token(identity = args['username'])
-            refresh_token = create_refresh_token(identity = args['username'])
-            return make_response(jsonify({
-                'message' : 'Logged in successfully',
-                'access_token': access_token,
-                'refresh_token': refresh_token
-            }))
-
-        else:
-
-            return make_response(jsonify({
-                'message' : 'Incorrect email or password'
-            }))
+                'message' : str(e),
+                'status' : 'failed'
+            }), 500)
