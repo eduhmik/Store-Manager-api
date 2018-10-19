@@ -1,7 +1,7 @@
 
 # Store-Manager-api
 [![Build Status](https://travis-ci.org/eduhmik/Store-Manager-api.svg?branch=ft-auth-jwt-api-161342719)](https://travis-ci.org/eduhmik/Store-Manager-api)
-[![Coverage Status](https://coveralls.io/repos/github/eduhmik/Store-Manager-api/badge.svg?branch=master)](https://coveralls.io/github/eduhmik/Store-Manager-api?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/eduhmik/Store-Manager-api/badge.svg?branch=ft-auth-jwt-api-161342719)](https://coveralls.io/github/eduhmik/Store-Manager-api?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/883774545d4244c292db2f22d18eac1e)](https://www.codacy.com/app/eduhmik/Store-Manager-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=eduhmik/Store-Manager-api&amp;utm_campaign=Badge_Grade)
 
 
