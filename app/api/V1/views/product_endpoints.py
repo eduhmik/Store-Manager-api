@@ -7,11 +7,11 @@ path='api/v1/products')
 
 parser = reqparse.RequestParser()
 parser.add_argument('product_id')
-parser.add_argument('product_name')
-parser.add_argument('category')
-parser.add_argument('quantity')
-parser.add_argument('reorder_level')
-parser.add_argument('price')
+parser.add_argument('product_name', help = 'This field cannot be blank', required = True)
+parser.add_argument('category', help = 'This field cannot be blank', required = True)
+parser.add_argument('quantity', help = 'This field cannot be blank', required = True)
+parser.add_argument('reorder_level', help = 'This field cannot be blank', required = True)
+parser.add_argument('price', help = 'This field cannot be blank', required = True)
 
 @api.route('')
 class ProductEndpoint(Resource):

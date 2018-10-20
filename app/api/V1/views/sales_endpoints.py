@@ -8,11 +8,11 @@ path='api/v1/sales')
 
 parser = reqparse.RequestParser()
 parser.add_argument('sales_id')
-parser.add_argument('product_id')
-parser.add_argument('product_name')
-parser.add_argument('quantity')
-parser.add_argument('total')
-parser.add_argument('seller')
+parser.add_argument('product_id', help = 'This field cannot be blank', required = True)
+parser.add_argument('product_name', help = 'This field cannot be blank', required = True)
+parser.add_argument('quantity', help = 'This field cannot be blank', required = True)
+parser.add_argument('total', help = 'This field cannot be blank', required = True)
+parser.add_argument('seller', help = 'This field cannot be blank', required = True)
 
 @api.route('')
 class SalesEndpoint(Resource):
