@@ -16,16 +16,14 @@ class UserLogoutAccess(Resource):
         try:
             access_token = authorization_header.split(" ")[1]
             identity = decode_token(access_token)
-            current_user = identity
         except Exception: 
             return make_response(jsonify({'status': 'failed',
                                   'message': 'authorization required'}), 401)
-        if current_user:
+        if identity:
             jti = get_raw_jwt()['jti']
             revoked_token = RevokedTokenModel(id, jti = jti)
             revoked_token.add()
             return {'message': 'Access token has been revoked'}
-        return make_response(jsonify({'status': 'failed','message': 'authorization required'}), 401)
 
 """user logout refresh"""
 @ns.route('')      
@@ -36,11 +34,10 @@ class UserLogoutRefresh(Resource):
         try:
             refresh_token = authorization_header.split(" ")[1]
             identity = decode_token(refresh_token)
-            current_user = identity
         except Exception: 
             return make_response(jsonify({'status': 'failed',
                                   'message': 'authorization required'}), 401)
-        if current_user:
+        if identity:
             jti = get_raw_jwt()['jti']
             revoked_token = RevokedTokenModel(id, jti = jti)
             revoked_token.add()
