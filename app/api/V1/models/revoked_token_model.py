@@ -13,7 +13,7 @@ class RevokedTokenModel():
         self.revoked.append(new)
         return new
 
-    
+    @classmethod
     def is_jti_blacklisted(self, jti):
         find_jti = [j for j in RevokedTokenModel.revoked if j['jti'] == jti]
         return bool(find_jti)
