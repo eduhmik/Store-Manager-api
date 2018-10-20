@@ -1,5 +1,6 @@
 # Library imports
 import json
+# Local application imports
 from .base_test import BaseTest
 
 
@@ -32,7 +33,7 @@ class TestGetProducts(BaseTest):
         )
 
             result = json.loads(response.data)
-            self.assertEqual("success", result["message"])
+            self.assertEqual("product created successfully", result["message"])
             self.assertEqual(response.status_code, 201)
 
     def test_get_products(self):
@@ -66,4 +67,5 @@ class TestGetProducts(BaseTest):
             result = self.client().get('/api/v1/products/4')
             response = json.loads(result.data)
             self.assertEqual("success", response["message"])
+            
         

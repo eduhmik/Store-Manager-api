@@ -37,5 +37,5 @@ class Product():
         product_item = [prod for prod in Product.products if prod['product_id'] == product_id]
         if product_item:
             return product_item
-        return 'product not found'
+        return {'message':'product not found'}
         

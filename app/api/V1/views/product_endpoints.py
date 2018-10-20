@@ -3,7 +3,7 @@ from flask_restplus import Resource, reqparse, Api, Namespace
 from ..models.product_model import Product
 
 api = Namespace('Product_endpoints', description='A collection of endpoints for the product model; includes get and post endpoints', 
-path='products/api/v1')
+path='api/v1/products')
 
 parser = reqparse.RequestParser()
 parser.add_argument('product_id')
@@ -29,7 +29,7 @@ class ProductEndpoint(Resource):
         created_product = new_product.create_product()
         return make_response(jsonify({
             'status': 'ok',
-            'message': 'success',
+            'message': 'product created successfully',
             'product': created_product
         }), 201)
     
@@ -55,7 +55,7 @@ class GetSingleProduct(Resource):
             return make_response(jsonify({
                 'status': 'ok',
                 'message': 'success',
-                'cart': single_product
+                'sale': single_product
             }), 200)
         return make_response(jsonify({
             'status': 'failed',

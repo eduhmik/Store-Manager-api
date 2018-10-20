@@ -4,7 +4,7 @@ This will contain the configuration to be reused in all tests.
 # Library imports 
 from unittest import TestCase
 from app import create_app
-from instance.config import app_config
+
 
 
 
