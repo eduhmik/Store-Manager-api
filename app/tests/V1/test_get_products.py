@@ -12,8 +12,8 @@ class TestGetProducts(BaseTest):
     data = {
         "product_id" : 2,
         "product_name": "Home Theatre",
-        "categoty": "Electonics",
-        "quantity": 7,
+        "category": "Electronics",
+        "quantity": 5,
         "reorder_level": 3,
         "price": 7999
     }
@@ -22,7 +22,7 @@ class TestGetProducts(BaseTest):
         """Test for a successful post"""
         with self.client():
             response = self.client().post(products_url, data=json.dumps(dict(
-                product_id=3,
+                product_id=2,
                 product_name = "Home Theatre",
                 category = "Electronics",
                 quantity = 5,
@@ -33,7 +33,7 @@ class TestGetProducts(BaseTest):
         )
 
             result = json.loads(response.data)
-            self.assertEqual("product created successfully", result["message"])
+            self.assertEqual('product created successfully', result['message'])
             self.assertEqual(response.status_code, 201)
 
     def test_get_products(self):

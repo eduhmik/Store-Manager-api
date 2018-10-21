@@ -4,6 +4,7 @@ from ..models.product_model import Product
 
 api = Namespace('Product_endpoints', description='A collection of endpoints for the product model; includes get and post endpoints', 
 path='api/v1/products')
+ns = Namespace('index_endpoint', description='Returns a simple hello world message')
 
 parser = reqparse.RequestParser()
 parser.add_argument('product_id')
@@ -14,6 +15,13 @@ parser.add_argument('reorder_level', help = 'This field cannot be blank', requir
 parser.add_argument('price', help = 'This field cannot be blank', required = True)
 
 @api.route('')
+@api.doc(params={'product_id' : 'product_id'})
+
+# resource_fields = api.model('Resource', {
+#     'product_id' : fields.String,
+#     'product_name' : fields.String,
+
+# })
 class ProductEndpoint(Resource):
     
     def post(self):
@@ -61,4 +69,12 @@ class GetSingleProduct(Resource):
             'status': 'failed',
             'message': 'not found'
         }), 404)  
+
+@ns.route('/')
+@api.doc(params={'name' : 'name'})
+class HelloWorld(Resource):
+    @api.doc(responses={200: 'success'})
+    def get(self):
+
+        return {'message':'Hello World'}
         
