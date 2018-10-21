@@ -1,3 +1,4 @@
+
 from flask import Flask, request, jsonify, Blueprint, json, make_response
 from flask_restplus import Resource, reqparse, Api, Namespace
 from ..models.sales_model import Sales
