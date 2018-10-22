@@ -1,6 +1,6 @@
 
 from flask import Flask, request, jsonify, Blueprint, json, make_response
-from flask_restplus import Resource, reqparse, Api, Namespace
+from flask_restplus import Resource, reqparse, Api, Namespace, fields
 from ..models.sales_model import Sales
 
 
@@ -17,8 +17,17 @@ parser.add_argument('seller', help = 'This field cannot be blank', required = Tr
 
 @api.route('')
 class SalesEndpoint(Resource):
-
+    sales_fields = api.model('Sale', {
+    'sales_id' : fields.Integer,
+    'product_id': fields.Integer,
+    'product_name' : fields.String,
+    'quantity': fields.Integer,
+    'total': fields.Integer,
+    'seller': fields.String
+})
+    @api.doc(body=sales_fields)
     def post(self):
+        """ Create new sale """ 
         args = parser.parse_args()
         sales_id = args['sales_id']
         product_id = args['product_id']
@@ -44,7 +53,7 @@ class SalesEndpoint(Resource):
             'sales': sales
         }), 200)
 
-@api.route('/<sales_id>')
+@api.route('/<int:sales_id>')
 class GetSingleSale(Resource):
     """Get single sale"""
     

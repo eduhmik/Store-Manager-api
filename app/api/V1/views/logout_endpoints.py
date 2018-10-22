@@ -4,9 +4,9 @@ from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_r
 from ..models.user_model import User
 from ..models.revoked_token_model import RevokedTokenModel
 
-api = Namespace('logout_endpoints', description='A collection of endpoints for the user model')
-ns = Namespace('logout_refresh', description='An endpoints for the logout/refresh')
-ns2 = Namespace('token refresh', description='An endpoints for the token/refresh')
+api = Namespace('logout_access', description='An endpoint to revoke access token')
+ns = Namespace('logout_refresh', description='An endpoint to revoke refresh token')
+ns2 = Namespace('token refresh', description='An endpoint to refresh token')
 """user logout"""  
 @api.route('')   
 class UserLogoutAccess(Resource):

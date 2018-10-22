@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, Blueprint, json, make_response
-from flask_restplus import Resource, reqparse, Api, Namespace
+from flask_restplus import Resource, reqparse, Api, Namespace, fields
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from ..models.user_model import User
 
@@ -12,6 +12,11 @@ parser.add_argument('password')
 """user login"""
 @api.route('')
 class UserLogin(Resource):
+    login_fields = api.model('User/Login', {
+    'email': fields.String,
+    'password': fields.String
+})
+    @api.doc(body=login_fields)
     def post(self):
         args = parser.parse_args()
         email = args['email']

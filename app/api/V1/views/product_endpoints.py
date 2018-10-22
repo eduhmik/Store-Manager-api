@@ -15,7 +15,7 @@ parser.add_argument('reorder_level', help = 'This field cannot be blank', requir
 parser.add_argument('price', help = 'This field cannot be blank', required = True)
 
 
-resource_fields = api.model('Resource', {
+product_fields = api.model('Product', {
     'product_id' : fields.Integer,
     'product_name' : fields.String,
     'category': fields.String,
@@ -25,8 +25,9 @@ resource_fields = api.model('Resource', {
 })
 @api.route('')
 class ProductEndpoint(Resource):
-    @api.doc(body=resource_fields)
+    @api.doc(body=product_fields)
     def post(self):
+        """ Create a new product """
         args = parser.parse_args()
         product_id = args['product_id']
         product_name = args['product_name']
