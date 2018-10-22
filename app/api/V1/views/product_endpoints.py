@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify, Blueprint, json, make_response
-from flask_restplus import Resource, reqparse, Api, Namespace
+from flask_restplus import Resource, reqparse, Api, Namespace, fields
 from ..models.product_model import Product
 
 api = Namespace('Product_endpoints', description='A collection of endpoints for the product model; includes get and post endpoints', 
@@ -14,16 +14,18 @@ parser.add_argument('quantity', help = 'This field cannot be blank', required = 
 parser.add_argument('reorder_level', help = 'This field cannot be blank', required = True)
 parser.add_argument('price', help = 'This field cannot be blank', required = True)
 
+
+resource_fields = api.model('Resource', {
+    'product_id' : fields.Integer,
+    'product_name' : fields.String,
+    'category': fields.String,
+    'quantity': fields.Integer,
+    'reorder_level': fields.Integer,
+    'price': fields.Integer
+})
 @api.route('')
-@api.doc(params={'product_id' : 'product_id'})
-
-# resource_fields = api.model('Resource', {
-#     'product_id' : fields.String,
-#     'product_name' : fields.String,
-
-# })
 class ProductEndpoint(Resource):
-    
+    @api.doc(body=resource_fields)
     def post(self):
         args = parser.parse_args()
         product_id = args['product_id']
@@ -52,29 +54,23 @@ class ProductEndpoint(Resource):
 
 
 
-@api.route('/<product_id>')
+@api.route('/<int:product_id>')
 class GetSingleProduct(Resource):
     """Get single product"""
     
     def get(self, product_id):
         """Get all products and a specific product when provided with an id"""
-        single_product = Product.get_single_product(self, product_id) 
+        single_product = Product.get_single_product(product_id) 
         if single_product:
             return make_response(jsonify({
                 'status': 'ok',
                 'message': 'success',
-                'sale': single_product
+                'product': single_product
             }), 200)
         return make_response(jsonify({
             'status': 'failed',
             'message': 'not found'
         }), 404)  
 
-@ns.route('/')
-@api.doc(params={'name' : 'name'})
-class HelloWorld(Resource):
-    @api.doc(responses={200: 'success'})
-    def get(self):
 
-        return {'message':'Hello World'}
         

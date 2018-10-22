@@ -80,8 +80,9 @@ class TestUser(BaseTest):
             headers = {
                 'Authorization': 'Bearer {}'.format(access_token)
             }
-            response = self.client().get('api/v1/logout/access', headers=headers)
-            response2 = self.client().post('api/v1/logout/access', data=json.dumps(data))
+            response = self.client().post(
+                '/api/v1/logout/access', headers=headers)
+    
             result = json.loads(response.data)
             self.assertEqual(response.status_code, 405)
             

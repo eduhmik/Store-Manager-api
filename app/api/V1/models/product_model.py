@@ -31,8 +31,8 @@ class Product():
         return Product.products
         
         
-
-    def get_single_product(self, product_id):
+    @staticmethod
+    def get_single_product(product_id):
         """Method to get a single product by id"""
         product_item = [prod for prod in Product.products if prod['product_id'] == product_id]
         if product_item:

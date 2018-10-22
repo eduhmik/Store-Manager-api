@@ -12,53 +12,33 @@ ns2 = Namespace('token refresh', description='An endpoints for the token/refresh
 class UserLogoutAccess(Resource):
     @jwt_required
     def post(self):
-        authorization_header = request.headers.get('Authorization')
+        
+        jti = get_raw_jwt()['jti']
         try:
-            access_token = authorization_header.split(" ")[1]
-            identity = decode_token(access_token)
-        except Exception: 
-            return make_response(jsonify({'status': 'failed',
-                                  'message': 'authorization required'}), 401)
-        if identity:
-            jti = get_raw_jwt()['jti']
             revoked_token = RevokedTokenModel(id, jti = jti)
             revoked_token.add()
             return {'message': 'Access token has been revoked'}
+        except:
+            return {'message': 'Something went wrong'}
 
 """user logout refresh"""
 @ns.route('')      
 class UserLogoutRefresh(Resource):
     @jwt_refresh_token_required
     def post(self):
-        authorization_header = request.headers.get('Authorization')
+        jti = get_raw_jwt()['jti']
         try:
-            refresh_token = authorization_header.split(" ")[1]
-            identity = decode_token(refresh_token)
-        except Exception: 
-            return make_response(jsonify({'status': 'failed',
-                                  'message': 'authorization required'}), 401)
-        if identity:
-            jti = get_raw_jwt()['jti']
             revoked_token = RevokedTokenModel(id, jti = jti)
             revoked_token.add()
             return {'message': 'Refresh token has been revoked'}
-        return make_response(jsonify({'status': 'failed','message': 'authorization required'}), 401)
-      
+        except:
+            return {'message': 'Something went wrong'}
 """token refresh"""  
 @ns2.route('')    
 class TokenRefresh(Resource):
     @jwt_refresh_token_required
     def post(self):
-        authorization_header = request.headers.get('Authorization')
-        try:
-            access_token = authorization_header.split(" ")[1]
-            identity = decode_token(access_token)
-            current_user = identity
-        except Exception: 
-            return make_response(jsonify({'status': 'failed',
-                                  'message': 'authorization required'}), 401)
-        if access_token:
-            current_user = get_jwt_identity()
-            access_token = create_access_token(identity = current_user)
-            return {'access_token': access_token}
-        return make_response(jsonify({'status': 'failed','message': 'authorization required'}), 401)
+        current_user = get_jwt_identity()
+        access_token = create_access_token(identity = current_user)
+        return {'access_token': access_token}
+        
