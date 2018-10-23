@@ -34,18 +34,22 @@ class UserRegistration(Resource):
         
         found_email = User.get_single_user(email)
         if found_email == 'not found':
-        
-            new_user = User(email, User.generate_hash(password), username, role, phone)
-            created_user = new_user.create_user()
-            auth_token = User.encode_auth_token(self, email)
-            return make_response(jsonify({
-                'status': 'ok',
-                'message': 'User created successfully',
-                'auth_token': auth_token,
-                'users': created_user
-            }), 201)
+            try:    
+                    new_user = User(email, User.generate_hash(password), username, role, phone)
+                    created_user = new_user.create_user()
+                    auth_token = User.encode_auth_token(self, email)
+                    return make_response(jsonify({
+                        'status': 'ok',
+                        'message': 'User created successfully',
+                        'auth_token': auth_token.decode(),
+                        'users': created_user
+                    }), 201)
+            except Exception as e:
+                return make_response(jsonify({
+                    'status': 'fail',
+                    'message': str(e)
+                }))
     
-        
         return make_response(jsonify({
                 'status': 'fail',
                 'message' : 'Email already exists'

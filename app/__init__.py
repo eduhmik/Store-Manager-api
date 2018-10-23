@@ -6,6 +6,8 @@ def create_app(config):
     '''configuring the flask app'''
     app = Flask(__name__)
 
+    app.config.from_object(app_config[config])
+    
     from .api.V1 import version1 as v1
     app.register_blueprint(v1)
    

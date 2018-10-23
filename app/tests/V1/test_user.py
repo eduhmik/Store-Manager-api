@@ -77,16 +77,16 @@ class TestUser(BaseTest):
             #User registration
             response = self.client().post(reg_url, data=json.dumps(dict(
                 username = 'Eduhmik',
-                email = 'edwinkimaita@gmail.com',
+                email = 'edwinkimaita2@gmail.com',
                 phone = '0718433329',
                 role = 'admin',
-                password = 1234
+                password = '12345'
             )), 
             content_type = 'application/json'
         )
 
             result = json.loads(response.data)
-            self.assertEqual('User created Successfully', result['message'])
+            self.assertEqual('User created successfully', result['message'])
             self.assertEqual(response.status_code, 201)
             self.assertNotEqual('Incorrect email or password', result['message'])
             self.assertTrue(result['auth_token'])
@@ -94,20 +94,17 @@ class TestUser(BaseTest):
 
             #Registered user login
             response2 = self.client().post(login_url, data=json.dumps(dict(
-                username = 'Eduhmik',
-                email = 'edwinkimaita@gmail.com',
-                phone = '0718433329',
-                role = 'admin',
-                password = 1234
+                email = 'edwinkimaita2@gmail.com',
+                password = '12345'
             )), 
             content_type = 'application/json'
         )
-            result = json.loads(response2.data)
-            self.assertEqual('Ok', result['status'])
-            self.assertTrue('logged in successfully', result['message'])
-            self.assertTrue(result['auth_token'])
-            self.assertTrue(response.content_type == 'application/json')
+            result2 = json.loads(response2.data)
+            self.assertEqual('ok', result['status'])
+            self.assertTrue('logged in successfully', result2['message'])
             self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.content_type == 'application/json')
+            
 
             
     def test_encode_auth_token(self):
