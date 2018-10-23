@@ -1,8 +1,7 @@
 from flask import Flask, request, jsonify, Blueprint, json, make_response
 from flask_restplus import Resource, reqparse, Api, Namespace, fields
-from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from ..models.user_model import User
-from ..models.revoked_token_model import RevokedTokenModel
+
 
 api = Namespace('register_endpoints', description='A collection of register endpoints for the user model')
 ns = Namespace('users', description='Users endpoints to fetch all users and delete them')
@@ -17,7 +16,7 @@ parser.add_argument('password', help = 'This field cannot be blank', required = 
 """user regitration"""
 @api.route('')
 class UserRegistration(Resource):
-    registration_fields = api.model('User/Registration', {
+    registration_fields = api.model('Registration', {
     'username' : fields.String,
     'email': fields.String,
     'phone' : fields.String,
@@ -32,23 +31,23 @@ class UserRegistration(Resource):
         phone = args['phone']
         role = args['role']
         password = args['password']
-
+        
         found_email = User.get_single_user(email)
         if found_email == 'not found':
         
             new_user = User(email, User.generate_hash(password), username, role, phone)
             created_user = new_user.create_user()
-            access_token = create_access_token(identity = args['email'])
-            refresh_token = create_refresh_token(identity = args['email'])
+            auth_token = User.encode_auth_token(self, email)
             return make_response(jsonify({
                 'status': 'ok',
                 'message': 'User created successfully',
-                'access_token': access_token,
-                'refresh_token': refresh_token,
+                'auth_token': auth_token,
                 'users': created_user
             }), 201)
+    
         
         return make_response(jsonify({
+                'status': 'fail',
                 'message' : 'Email already exists'
             }))
 

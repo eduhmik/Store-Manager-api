@@ -12,9 +12,10 @@ class TestSales(BaseTest):
     data = {
         "sales_id" : 2,
         "product_id": 1,
+        "product_name": 'Home Theatre',
         "quantity": 1,
         "total": 3,
-        "seller": 7999
+        "seller": 'john doe'
     }
 
     def test_post_sales(self):

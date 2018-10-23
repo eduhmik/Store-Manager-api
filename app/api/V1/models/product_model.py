@@ -1,5 +1,4 @@
 """ product model class and various functions"""
-
 class Product():
     product_id = 1
     products = []
