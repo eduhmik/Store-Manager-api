@@ -50,13 +50,14 @@ class User():
     def verify_hash(password, hash):
         return sha256.verify(password, hash)
 
-    def encode_auth_token(self, email):
+    @classmethod
+    def encode_auth_token(cls, email, role):
         """ Generates an Auth token"""
         try:
             payload = {
-                'exp': datetime.datetime.now() + datetime.timedelta(days=0, seconds=5),
+                'exp': datetime.datetime.now() + datetime.timedelta(days=1, seconds=10),
                 'iat': datetime.datetime.now(),
-                'sub': email
+                'sub': {"email" :email, "role" :role}
             }
             return jwt.encode(
                 payload,

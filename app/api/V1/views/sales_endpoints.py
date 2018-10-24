@@ -2,6 +2,7 @@
 from flask import Flask, request, jsonify, Blueprint, json, make_response
 from flask_restplus import Resource, reqparse, Api, Namespace, fields
 from ..models.sales_model import Sales
+from ..models.user_model import User
 
 
 api = Namespace('Sales_endpoints', description='A collection of endpoints for the sales model; includes get and post endpoints', 
@@ -25,49 +26,119 @@ class SalesEndpoint(Resource):
     'total': fields.Integer,
     'seller': fields.String
 })
-    @api.doc(body=sales_fields)
+    @api.expect(sales_fields, validate=True)
+    @api.doc(security='apikey')
     def post(self):
-        """ Create new sale """ 
-        args = parser.parse_args()
-        sales_id = args['sales_id']
-        product_id = args['product_id']
-        product_name = args['product_name']
-        quantity = args['quantity']
-        total = args['total']
-        seller = args['seller']
+        """ Create new sale """
 
-        new_sale = Sales(sales_id, product_id, product_name, quantity, total, seller)
-        created_sale = new_sale.create_sale()
-        return make_response(jsonify({
-            'status': 'ok',
-            'message': 'Sale created successfully',
-            'sales': created_sale
-        }), 201)
+        #User authentication
+        authentication_header = request.headers.get('Authorization') 
 
+        if authentication_header:
+            try:
+                auth_token = authentication_header.split(" ")[1]
+                identity = User.decode_auth_token(auth_token)
+                if identity == 'Invalid token. Please sign in again':
+                    return make_response(jsonify({
+                        'status': 'failed',
+                        'message': 'Invalid token. Please sign in again'
+                    }), 401)
+
+            except Exception:
+                return make_response(jsonify({
+                    'status': 'failed',
+                    'message': 'You are not authorized'
+                }), 401)
+            if auth_token:
+                args = parser.parse_args()
+                sales_id = args['sales_id']
+                product_id = args['product_id']
+                product_name = args['product_name']
+                quantity = args['quantity']
+                total = args['total']
+                seller = args['seller']
+
+                new_sale = Sales(sales_id, product_id, product_name, quantity, total, seller)
+                created_sale = new_sale.create_sale()
+                return make_response(jsonify({
+                    'status': 'ok',
+                    'message': 'Sale created successfully',
+                    'sales': created_sale
+                }), 201)
+
+    @api.doc(security='apikey')
     def get(self):
         """Get all sales"""
-        sales = Sales.get_all_sales(self)
-        return make_response(jsonify({
-            'message':  'success',
-            'status': 'ok',
-            'sales': sales
-        }), 200)
+    
+        """User authentication"""
+        authentication_header = request.get('Authorization')
+        if authentication_header:
+            try:
+                auth_token = authentication_header.split(" ")[1]
+                identity = User.decode_auth_token(auth_token)
+                if identity == 'Invalid token. Please log in again.':
+                    return make_response(jsonify({
+                        'status': 'failed',
+                        'message': 'Invalid token. Please log in again.'
+                    }), 401)
+
+            except Exception:
+                return make_response(jsonify({
+                    'status': 'failed',
+                    'message': 'You are not authorized'
+                }), 401)
+            if auth_token:
+                if identity['role'] == 'attendant':
+                    return make_response(jsonify({
+                        'status': 'failed',
+                        'message': 'You are not an admin'
+                    }), 401)
+                sales = Sales.get_all_sales(self)
+                return make_response(jsonify({
+                    'message':  'success',
+                    'status': 'ok',
+                    'sales': sales
+                }), 200)
 
 @api.route('/<int:sales_id>')
 class GetSingleSale(Resource):
-    """Get single sale"""
+    """Get single sale""" 
     
+    @api.doc(security='apikey')
     def get(self, sales_id):
-        """Get all sales and a specific sale when provided with an id"""
-        single_sale = Sales.get_single_sale(self, sales_id) 
-        if single_sale:
-            return make_response(jsonify({
-                'status': 'ok',
-                'message': 'success',
-                'sale': single_sale
-            }), 200)
-        return make_response(jsonify({
-            'status': 'failed',
-            'message': 'not found'
-        }), 404)
+        """Get a specific sale when provided with an id"""
+        """User authentication"""
+        authentication_header = request.get('Authorization')
+        if authentication_header:
+            try:
+                auth_token = authentication_header.split(" ")[1]
+                identity = User.decode_auth_token(auth_token)
+                if identity == 'Invalid token. Please sign in again':
+                    return make_response(jsonify({
+                        'status': 'failed',
+                        'message': 'Invalid token. Please sign in again'
+                    }), 401)
+
+            except Exception:
+                return make_response(jsonify({
+                    'status': 'failed',
+                    'message': 'You are not authorized'
+                }), 401)
+            if auth_token:
+                if identity['role'] == 'attendant':
+                    return make_response(jsonify({
+                        'status': 'failed',
+                        'message': 'You are not an admin'
+                    }), 401)
+                single_sale = Sales.get_single_sale(self, sales_id) 
+                if single_sale:
+                    return make_response(jsonify({
+                        'status': 'ok',
+                        'message': 'success',
+                        'sale': single_sale
+                    }), 200)
+                return make_response(jsonify({
+                    'status': 'failed',
+                    'message': 'not found'
+                }), 404)
 
