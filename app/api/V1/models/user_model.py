@@ -1,6 +1,6 @@
 from passlib.hash import pbkdf2_sha256 as sha256
 from app.instance.config import secret_key
-import datetime
+from datetime import datetime, timedelta
 import jwt
 
 class User():
@@ -50,15 +50,15 @@ class User():
     def verify_hash(password, hash):
         return sha256.verify(password, hash)
 
-    
-    def encode_auth_token(self, email, role):
+    @staticmethod
+    def encode_auth_token(email, role):
         """ Generates an Auth token"""
         try:
             payload = {
-                'exp': datetime.datetime.now() + datetime.timedelta(days=1, seconds=10),
-                'iat': datetime.datetime.now(),
-                'sub': self.email,
-                'role': self.role
+                'exp': datetime.now() + timedelta(days=1, seconds=5),
+                'iat': datetime.now(),
+                'sub': email,
+                'role':role
             }
             return jwt.encode(
                 payload,
@@ -71,9 +71,9 @@ class User():
     @staticmethod
     def decode_auth_token(auth_token):
         """Method to decode the auth token"""
-
+        
         try:
-            payload = jwt.decode(auth_token, secret_key)
+            payload = jwt.decode(auth_token, secret_key, options={'verify_iat': False})
             return payload
         except jwt.ExpiredSignatureError:
             return {'message': 'Signature expired. Please log in again.'}

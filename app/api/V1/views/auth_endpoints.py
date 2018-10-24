@@ -25,7 +25,6 @@ login_fields = api.model('Login', {
 @ns2.route('')
 class UserLogin(Resource):
     @ns2.expect(login_fields)
-    @ns2.doc(security='apikey')
     def post(self):
         args = parser.parse_args()
         email = args['email']
@@ -33,7 +32,7 @@ class UserLogin(Resource):
                 
         try:
             current_user = User.get_single_user(email)
-            print(current_user)
+            # print(current_user)
             if current_user == 'not found':
                 return make_response(jsonify({
                     'status': 'success',
@@ -42,8 +41,8 @@ class UserLogin(Resource):
             if current_user and User.verify_hash(password, current_user['password']):
                 role = current_user['role']
                 email = current_user['email']
-                auth_token = User.encode_auth_token(self, email, role)   
-                print (auth_token)
+                auth_token = User.encode_auth_token(email, role)   
+                # print (auth_token)
                 if auth_token:
                     return make_response(jsonify({
                         'status' : 'ok',
@@ -91,7 +90,6 @@ class UserRegistration(Resource):
             try:    
                 new_user = User(email, User.generate_hash(password), username, role, phone)
                 created_user = new_user.create_user()
-                auth_token = User.encode_auth_token(self, email, role)
                 return make_response(jsonify({
                     'status': 'ok',
                     'message': 'User created successfully',

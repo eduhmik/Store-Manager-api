@@ -4,7 +4,7 @@ class Product():
     products = []
     
     """ Initializing the constructor"""
-    def __init__(self, product_id, product_name, category, quantity, reoder_level, price):
+    def __init__(self, product_name, category, quantity, reoder_level, price):
         self.product_id = len(Product.products) + 1
         self.product_name = product_name
         self.category = category
