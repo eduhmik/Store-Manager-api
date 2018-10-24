@@ -24,7 +24,7 @@ login_fields = api.model('Login', {
 """user login"""
 @ns2.route('')
 class UserLogin(Resource):
-    @ns2.expect(login_fields, validate=True)
+    @ns2.expect(login_fields)
     @ns2.doc(security='apikey')
     def post(self):
         args = parser.parse_args()
@@ -33,6 +33,7 @@ class UserLogin(Resource):
                 
         try:
             current_user = User.get_single_user(email)
+            print(current_user)
             if current_user == 'not found':
                 return make_response(jsonify({
                     'status': 'success',
@@ -40,7 +41,9 @@ class UserLogin(Resource):
                 }), 200)
             if current_user and User.verify_hash(password, current_user['password']):
                 role = current_user['role']
-                auth_token = User.encode_auth_token(email, role)   
+                email = current_user['email']
+                auth_token = User.encode_auth_token(self, email, role)   
+                print (auth_token)
                 if auth_token:
                     return make_response(jsonify({
                         'status' : 'ok',
@@ -73,9 +76,7 @@ registration_fields = api.model('Registration', {
 """user regitration"""
 @api.route('')
 class UserRegistration(Resource):
-    
-    @api.doc(security='apikey')
-    @api.expect(registration_fields, validate=True)
+    @api.expect(registration_fields)
     def post(self):
         args = parser.parse_args()
         username = args['username']
@@ -86,26 +87,27 @@ class UserRegistration(Resource):
         
         found_email = User.get_single_user(email)
         if found_email == 'not found':
+
             try:    
-                    new_user = User(email, User.generate_hash(password), username, role, phone)
-                    created_user = new_user.create_user()
-                    auth_token = User.encode_auth_token(email, role)
-                    return make_response(jsonify({
-                        'status': 'ok',
-                        'message': 'User created successfully',
-                        'auth_token': auth_token.decode(),
-                        'users': created_user
-                    }), 201)
+                new_user = User(email, User.generate_hash(password), username, role, phone)
+                created_user = new_user.create_user()
+                auth_token = User.encode_auth_token(self, email, role)
+                return make_response(jsonify({
+                    'status': 'ok',
+                    'message': 'User created successfully',
+                    'users': created_user
+                }), 201)
+            
             except Exception as e:
                 return make_response(jsonify({
-                    'status': 'fail',
-                    'message': str(e)
-                }))
-    
+                'message' : str(e),
+                'status' : 'failed'
+            }), 500)
+
         return make_response(jsonify({
-                'status': 'fail',
-                'message' : 'Email already exists'
-            }))
+                        'status': 'fail',
+                        'message' : 'Email already exists'
+                    }))
 
 """fetch all users""" 
 @ns.route('')  

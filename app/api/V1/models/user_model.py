@@ -50,14 +50,15 @@ class User():
     def verify_hash(password, hash):
         return sha256.verify(password, hash)
 
-    @classmethod
-    def encode_auth_token(cls, email, role):
+    
+    def encode_auth_token(self, email, role):
         """ Generates an Auth token"""
         try:
             payload = {
                 'exp': datetime.datetime.now() + datetime.timedelta(days=1, seconds=10),
                 'iat': datetime.datetime.now(),
-                'sub': {"email" :email, "role" :role}
+                'sub': self.email,
+                'role': self.role
             }
             return jwt.encode(
                 payload,
@@ -73,7 +74,7 @@ class User():
 
         try:
             payload = jwt.decode(auth_token, secret_key)
-            return payload['sub']
+            return payload
         except jwt.ExpiredSignatureError:
             return {'message': 'Signature expired. Please log in again.'}
         except jwt.InvalidTokenError:

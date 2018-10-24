@@ -26,53 +26,51 @@ class ProductEndpoint(Resource):
     'reorder_level': fields.Integer,
     'price': fields.Integer
 })
-    @api.expect(product_fields, validate=True)
+    @api.expect(product_fields)
     @api.doc(security='apikey')
     def post(self):
         """ Create a new product """
 
         """User authentication"""
         authentication_header = request.headers.get('Authorization')
-        
-        auth_token = authentication_header.split(" ")[1]
-        
-            
-        try:
-            identity = User.decode_auth_token(auth_token)
-            if identity == 'Invalid token. Please log in again.':
+        if authentication_header:    
+            try:
+                auth_token = authentication_header.split(" ")[1]
+                identity = User.decode_auth_token(auth_token)
+                if identity == 'Invalid token. Please log in again.':
+                    return make_response(jsonify({
+                        'status': 'failed',
+                        'message': 'Invalid token. Please log in again.'
+                    }), 401)
+
+            except Exception:
                 return make_response(jsonify({
                     'status': 'failed',
-                    'message': 'Invalid token. Please log in again.'
+                    'message': 'You are not authorized'
                 }), 401)
+                
+            if auth_token:
+                if identity['role'] == 'attendant':
+                    return make_response(jsonify({
+                        'status': 'failed',
+                        'message': 'You are not an admin'
+                    }), 401)
 
-        except Exception:
-            return make_response(jsonify({
-                'status': 'failed',
-                'message': 'You are not authorized'
-            }), 401)
-            
-        if auth_token:
-            if identity['role'] == 'attendant':
+                args = parser.parse_args()
+                product_id = args['product_id']
+                product_name = args['product_name']
+                category = args['category']
+                quantity = args['quantity']
+                reoder_level = args['reorder_level']
+                price = args['price']
+
+                new_product = Product(product_id, product_name, category, quantity, reoder_level, price)
+                created_product = new_product.create_product()
                 return make_response(jsonify({
-                    'status': 'failed',
-                    'message': 'You are not an admin'
-                }), 401)
-
-            args = parser.parse_args()
-            product_id = args['product_id']
-            product_name = args['product_name']
-            category = args['category']
-            quantity = args['quantity']
-            reoder_level = args['reorder_level']
-            price = args['price']
-
-            new_product = Product(product_id, product_name, category, quantity, reoder_level, price)
-            created_product = new_product.create_product()
-            return make_response(jsonify({
-                'status': 'ok',
-                'message': 'product created successfully',
-                'product': created_product
-            }), 201)
+                    'status': 'ok',
+                    'message': 'product created successfully',
+                    'product': created_product
+                }), 201)
        
     @api.doc(security='apikey')
     def get(self):
@@ -81,37 +79,37 @@ class ProductEndpoint(Resource):
         authentication_header = request.headers.get('Authorization')
 
         if authentication_header:
-            try:
-                auth_token = authentication_header.split(" ")[1]
-                identity = User.decode_auth_token(auth_token)
-                if identity == 'Invalid token. Please sign in again':
-                    return make_response(jsonify({
-                        'status': 'failed',
-                        'message': 'Invalid token. Please sign in again'
-                    }), 401)
+            
+            auth_token = authentication_header.split(" ")[1]
+            identity = User.decode_auth_token(auth_token)
+            if identity == 'Invalid token. Please sign in again':
+                return make_response(jsonify({
+                    'status': 'failed',
+                    'message': 'Invalid token. Please sign in again'
+                }), 401)
 
-            except Exception:
+            else:    
                 return make_response(jsonify({
                     'status': 'failed',
                     'message': 'You are not authorized'
                 }), 401)
-            if auth_token:
-                products = Product.get_all_products(self)
-                if len(products) == 0:
-                    return make_response(jsonify({
-                        'message':  'success',
-                        'status': 'ok',
-                        'product': 'Inventory empty. Add products'
-                    }), 200)
+        if auth_token:
+            products = Product.get_all_products(self)
+            if len(products) == 0:
                 return make_response(jsonify({
                     'message':  'success',
                     'status': 'ok',
-                    'product': products
+                    'product': 'Inventory empty. Add products'
                 }), 200)
             return make_response(jsonify({
-                        'status': 'failed',
-                        'message': 'You are not authorized'
-                    }), 401)
+                'message':  'success',
+                'status': 'ok',
+                'product': products
+            }), 200)
+        return make_response(jsonify({
+                    'status': 'failed',
+                    'message': 'You are not authorized'
+                }), 401)
 
 
 

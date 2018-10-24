@@ -5,7 +5,7 @@ class for app configurations
 class Config():
     """Base Config"""
     DEBUG = True
-    SECRET_KEY = 'I am the secret key'
+    SECRET_KEY = os.getenv('secret')
 
 class Development(Config):
     '''Configurations for development'''
