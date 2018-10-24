@@ -77,39 +77,41 @@ class ProductEndpoint(Resource):
         """Get all products"""
         #User authentication
         authentication_header = request.headers.get('Authorization')
+        if authentication_header:    
+            try:
+                auth_token = authentication_header.split(" ")[1]
+                    
+                identity = User.decode_auth_token(auth_token)
+                
+                if identity == 'Invalid token. Please log in again.':
+                    return make_response(jsonify({
+                        'status': 'failed',
+                        'message': 'Invalid token. Please log in again.'
+                    }), 401)
 
-        if authentication_header:
-            
-            auth_token = authentication_header.split(" ")[1]
-            identity = User.decode_auth_token(auth_token)
-            if identity == 'Invalid token. Please sign in again':
-                return make_response(jsonify({
-                    'status': 'failed',
-                    'message': 'Invalid token. Please sign in again'
-                }), 401)
-
-            else:    
+            except Exception:
                 return make_response(jsonify({
                     'status': 'failed',
                     'message': 'You are not authorized'
                 }), 401)
-        if auth_token:
-            products = Product.get_all_products(self)
-            if len(products) == 0:
+                
+            if auth_token:
+                products = Product.get_all_products(self)
+                if len(products) == 0:
+                    return make_response(jsonify({
+                        'message':  'success',
+                        'status': 'ok',
+                        'product': 'Inventory empty. Add products'
+                    }), 200)
                 return make_response(jsonify({
                     'message':  'success',
                     'status': 'ok',
-                    'product': 'Inventory empty. Add products'
+                    'product': products
                 }), 200)
             return make_response(jsonify({
-                'message':  'success',
-                'status': 'ok',
-                'product': products
-            }), 200)
-        return make_response(jsonify({
-                    'status': 'failed',
-                    'message': 'You are not authorized'
-                }), 401)
+                        'status': 'failed',
+                        'message': 'You are not authorized'
+                    }), 401)
 
 
 

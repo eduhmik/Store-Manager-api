@@ -65,7 +65,7 @@ class SalesEndpoint(Resource):
         """Get all sales"""
     
         """User authentication"""
-        authentication_header = request.get('Authorization')
+        authentication_header = request.headers.get('Authorization')
         if authentication_header:
             try:
                 auth_token = authentication_header.split(" ")[1]
