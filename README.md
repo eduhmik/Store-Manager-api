@@ -41,7 +41,7 @@ Store Manager is a web application that helps store owners manage sales and prod
 
 
 Endpoint                   | Functionality                |
-
+-------------------------- | -----------------------------|
 GET /products              | Fetch all products           |
 
 GET /products/<productId>  | Fetch a single product record|
