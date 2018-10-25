@@ -37,24 +37,24 @@ Store Manager is a web application that helps store owners manage sales and prod
 # Authors
 * **Edwin Kimaita** - *Initial work* - [Eduhmik](https://github.com/Eduhmik)
 
+
+
+
 Endpoint                   | Functionality                |
 ---------------------------|------------------------------|
-GET /products                Fetch all products           |
+GET /products              | Fetch all products           |
 ---------------------------|------------------------------|
-GET /products/<productId>    Fetch a single product record|
+GET /products/<productId>  | Fetch a single product record|
 ---------------------------|------------------------------|
-GET /sales                   Fetch all sale records       |
+GET /sales                 | Fetch all sale records       |
 ---------------------------|------------------------------|
-GET /sales/<saleId>          Fetch a single sale record   |
+GET /sales/<saleId>        | Fetch a single sale record   |
 ---------------------------|---------------               |
-POST /products               Create a product             |
+POST /products             | Create a product             |
 ---------------------------|------------------------------|
-POST /sales                  Create a sale order          |
+POST /sales                | Create a sale order          |
 ---------------------------|------------------------------|
-POST /auth/signup            Register a user              |
+POST /auth/signup          | Register a user              |
 ---------------------------|------------------------------|
-POST /auth/login             Login a user                 |
+POST /auth/login           | Login a user                 |
 ---------------------------|------------------------------|
-
-
-     |
