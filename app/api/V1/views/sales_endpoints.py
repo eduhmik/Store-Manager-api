@@ -102,7 +102,7 @@ class GetSingleSale(Resource):
     def get(self, sales_id):
         """Get a specific sale when provided with an id"""
         """User authentication"""
-        authentication_header = request.get('Authorization')
+        authentication_header = request.headers.get('Authorization')
         if authentication_header:
             try:
                 auth_token = authentication_header.split(" ")[1]
