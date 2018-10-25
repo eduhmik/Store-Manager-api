@@ -32,17 +32,17 @@ class UserLogin(Resource):
                 
         try:
             current_user = User.get_single_user(email)
+            print(current_user)
             # print(current_user)
             if current_user == 'not found':
                 return make_response(jsonify({
                     'status': 'success',
                     'message': 'User does not exist, sign up!'
-                }), 200)
+                }), 404)
             if current_user and User.verify_hash(password, current_user['password']):
                 role = current_user['role']
                 email = current_user['email']
                 auth_token = User.encode_auth_token(email, role)   
-                # print (auth_token)
                 if auth_token:
                     return make_response(jsonify({
                         'status' : 'ok',
@@ -54,8 +54,8 @@ class UserLogin(Resource):
 
                 return make_response(jsonify({
                     'message' : 'Incorrect email or password',
-                    'status' : 'ok'
-                }), 200)
+                    'status' : 'fail'
+                }), 400)
 
         except Exception as e:
             return make_response(jsonify({
@@ -104,7 +104,7 @@ class UserRegistration(Resource):
 
         return make_response(jsonify({
                         'status': 'fail',
-                        'message' : 'Email already exists'
+                        'message' : 'Email already exists, please log in'
                     }))
 
 """fetch all users""" 
@@ -119,14 +119,6 @@ class AllUsers(Resource):
             'users': users_list
         }), 200)
 
-
-    def delete(self):
-        empty_list = [User.del_users(self)]
-        return make_response(jsonify({
-            'message':  'Delete all users successful',
-            'status': 'ok',
-            'users': empty_list
-        }), 200)
 
 """user logout"""  
 @ns3.route('') 

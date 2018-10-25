@@ -64,7 +64,7 @@ class TestUser(BaseTest):
         )
             result = json.loads(response.data)
             self.assertEqual('fail', result['status'])
-            self.assertEqual('Email already exists', result['message'])
+            self.assertEqual('Email already exists, please log in', result['message'])
             self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 200)
 
