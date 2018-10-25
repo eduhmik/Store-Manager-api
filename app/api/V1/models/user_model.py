@@ -3,10 +3,9 @@ from app.instance.config import secret_key
 from datetime import datetime, timedelta
 import jwt
 
-user_id = 1
-users = []
-
 class User():
+    user_id = 1
+    users = []
 
     def __init__(self, email, password, username, role, phone):
         self.username = username
@@ -23,21 +22,21 @@ class User():
             role = self.role,
             phone = self.phone
         )
-        users.append(user)
+        User.users.append(user)
         return user
         
     @staticmethod
     def get_single_user(email):
         """Retrieve user details by email"""
 
-        single_user = [user for user in users if user['email'] == email]
+        single_user = [user for user in User.users if user['email'] == email]
         if single_user:
             return single_user[0]
         return 'not found'
 
 
     def get_all_users(self):
-        return users
+        return User.users
 
    
 

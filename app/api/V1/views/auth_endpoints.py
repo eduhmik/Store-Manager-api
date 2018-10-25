@@ -32,13 +32,11 @@ class UserLogin(Resource):
                 
         try:
             current_user = User.get_single_user(email)
-            print(current_user)
-            # print(current_user)
             if current_user == 'not found':
                 return make_response(jsonify({
                     'status': 'success',
                     'message': 'User does not exist, sign up!'
-                }), 404)
+                }), 200)
             if current_user and User.verify_hash(password, current_user['password']):
                 role = current_user['role']
                 email = current_user['email']
