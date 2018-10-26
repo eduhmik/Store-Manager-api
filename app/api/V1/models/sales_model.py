@@ -2,9 +2,8 @@ class Sales():
     sales_id = 0
     sales = []
     """initializing the constructor"""
-    def __init__(self, sales_id, product_id, product_name, quantity, total, seller):
+    def __init__(self, product_name, quantity, total, seller):
         self.sales_id = len(Sales.sales) + 1
-        self.product_id = product_id
         self.product_name = product_name
         self.quantity = quantity
         self.total = total
@@ -14,7 +13,6 @@ class Sales():
         """Method to create a new sale into list"""
         sales_item = dict(
             sales_id = self.sales_id,
-            product_id = self.product_id,
             product_name = self.product_name,
             quantity = self.quantity,
             total = self.total,

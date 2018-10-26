@@ -3,8 +3,11 @@ python:
   - "3.6"
 
 script:    
-  - pytest --cov-report term-missing --cov=app
+  - pytest --cov=app/api
   - coveralls
+
+env:
+  - export SECRET_KEY='This is my secret key'
 
 after_success:
   - coveralls

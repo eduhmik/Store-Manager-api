@@ -2,24 +2,12 @@
 import json
 # Local application imports
 from .base_test import BaseTest
+from app.api.V1.models.user_model import User
 
-reg_url = 'api/v1/registration'
-login_url = 'api/v1/login'
+reg_url = 'api/v1/auth/signup'
+login_url = 'api/v1/auth/login'
 token_url = 'api/v1/token/refresh'
 
-data = {
-    "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1Mzk5ODQ5MDEsIm5iZiI6MTUzOTk4NDkwMSwianRpIjoiMTEwZDhmNjUtNmE0ZS00ZjdmLWI1MmItNDNlYWQyNWY2ZGIwIiwiZXhwIjoxNTM5OTg1ODAxLCJpZGVudGl0eSI6ImVkd2lua2ltYWl0YTNAZ21haWwuY29tIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.dnZgmLljm6uGWTxcM3SbETRAQ6qGP7-JoT9y7dLRcqo",
-    "message": "User created successfully",
-    "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1Mzk5ODQ5MDEsIm5iZiI6MTUzOTk4NDkwMSwianRpIjoiYTM2ODUzMWQtODA1OC00NTYyLWJhYTEtNTlkZDRjNWE4MGY1IiwiZXhwIjoxNTQyNTc2OTAxLCJpZGVudGl0eSI6ImVkd2lua2ltYWl0YTNAZ21haWwuY29tIiwidHlwZSI6InJlZnJlc2gifQ.5sQjabj9u9HfPe6alYvy73jnNDpyUSuhNOM92qCaMcc",
-    "status": "ok",
-    "users": {
-        "email": "edwinkimaita3@gmail.com",
-        "password": "$pbkdf2-sha256$29000$rTWGsNZaS4mREiJk7F0L4Q$Wmrza5o7jy.kPhF.5eP.EukfSHyK4k2OCJWFyScdWVU",
-        "phone": "0718433329",
-        "role": "admin",
-        "username": "Eduhmik"
-    }
-}
 
 class TestUser(BaseTest):
 
@@ -30,14 +18,16 @@ class TestUser(BaseTest):
                 email = 'edwinkimaita@gmail.com',
                 phone = '0718433329',
                 role = 'admin',
-                password = 1234
+                password = '1234'
             )), 
             content_type = 'application/json'
         )
-        result = json.loads(response.data)
-        self.assertEqual(response.status_code, 201)
-        self.assertEqual('User created successfully', result['message'])
-        self.assertEqual('ok', result['status'])
+            result = json.loads(response.data)
+            self.assertEqual('User created successfully', result['message'])
+            self.assertEqual(response.status_code, 201)
+            self.assertEqual('ok', result['status'])
+            self.assertTrue(response.content_type == 'application/json')
+
 
 
     def test_get_single_user(self):
@@ -52,55 +42,89 @@ class TestUser(BaseTest):
             content_type = 'application/json'
         )
 
-            result = self.client().get('/api/v1/registration')
             self.assertEqual(response.status_code, 200)
-            
-    
-    def test_user_login(self):
+
+    def test_create_user_already_exist(self):
+        user = User(
+            username = 'eduhmik',
+            email = 'edwinkimaita@gmail.com',
+            password = '1234',
+            phone = '0718433329',
+            role = 'admin'
+        )
         with self.client():
-            response = self.client().post(login_url, data=json.dumps(dict(
+            response = self.client().post(reg_url, data=json.dumps(dict(
                 username = 'Eduhmik',
                 email = 'edwinkimaita@gmail.com',
                 phone = '0718433329',
                 role = 'admin',
                 password = 1234
+            )),
+            content_type = 'application/json'
+        )
+            result = json.loads(response.data)
+            self.assertEqual('fail', result['status'])
+            self.assertEqual('Email already exists, please log in', result['message'])
+            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(response.status_code, 200)
+
+            
+    
+    def test_user_login(self):
+        """test for registered user login"""
+        with self.client():
+            #User registration
+            response = self.client().post(reg_url, data=json.dumps(dict(
+                username = 'Eduhmik',
+                email = 'edwinkimaita2@gmail.com',
+                phone = '0718433329',
+                role = 'admin',
+                password = '12345'
             )), 
             content_type = 'application/json'
         )
 
             result = json.loads(response.data)
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual('Logged in successfully', result['message'])
+            self.assertEqual('User created successfully', result['message'])
+            self.assertEqual(response.status_code, 201)
             self.assertNotEqual('Incorrect email or password', result['message'])
+            self.assertTrue(response.content_type == 'application/json')
 
+            #Registered user login
+            response2 = self.client().post(login_url, data=json.dumps(dict(
+                email = 'edwinkimaita2@gmail.com',
+                password = '12345'
+            )), 
+            content_type = 'application/json'
+        )
+            result2 = json.loads(response2.data)
+            self.assertEqual('ok', result['status'])
+            self.assertTrue('logged in Successfully', result2['message'])
+            self.assertEqual(response2.status_code, 200)
+            self.assertTrue(response.content_type == 'application/json')
             
-    def test_logout_access(self):
-        with self.client():
-            access_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1Mzk5ODQ5MDEsIm5iZiI6MTUzOTk4NDkwMSwianRpIjoiMTEwZDhmNjUtNmE0ZS00ZjdmLWI1MmItNDNlYWQyNWY2ZGIwIiwiZXhwIjoxNTM5OTg1ODAxLCJpZGVudGl0eSI6ImVkd2lua2ltYWl0YTNAZ21haWwuY29tIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.dnZgmLljm6uGWTxcM3SbETRAQ6qGP7-JoT9y7dLRcqo"
-            headers = {
-                'Authorization': 'Bearer {}'.format(access_token)
-            }
-            response = self.client().post(
-                '/api/v1/logout/access', headers=headers)
-    
-            result = json.loads(response.data)
-            self.assertEqual(response.status_code, 405)
             
+    def test_encode_auth_token(self):
+        user = User(
+            username = 'eduhmik',
+            email = 'edwinkimaita@gmail.com',
+            password = '1234',
+            phone = '0718433329',
+            role = 'admin'
+        )
 
-    def test_logout_refresh(self):
-        with self.client():
-            refresh_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpYXQiOjE1Mzk5ODQ5MDEsIm5iZiI6MTUzOTk4NDkwMSwianRpIjoiMTEwZDhmNjUtNmE0ZS00ZjdmLWI1MmItNDNlYWQyNWY2ZGIwIiwiZXhwIjoxNTM5OTg1ODAxLCJpZGVudGl0eSI6ImVkd2lua2ltYWl0YTNAZ21haWwuY29tIiwiZnJlc2giOmZhbHNlLCJ0eXBlIjoiYWNjZXNzIn0.dnZgmLljm6uGWTxcM3SbETRAQ6qGP7-JoT9y7dLRcqo"
-            headers = {
-                'Authorization': 'Bearer {}'.format(refresh_token)
-            }
-            response = self.client().get('api/v1/logout/refresh', headers=headers)
-            response2 = self.client().post('api/v1/logout/refresh', data=json.dumps(data))
-            result = json.loads(response.data)
-            self.assertEqual(response.status_code, 405)
-            
-    
-    def test_token_refresh(self):
-        with self.client():
-            response = self.client().post(token_url, data=json.dumps(data))
-            result = json.loads(response.data)
-            self.assertEqual(response.status_code, 500)
+        auth_token = user.encode_auth_token(user.email, user.role)
+        self.assertTrue(isinstance(auth_token, bytes))
+
+    def test_decode_auth_token(self):
+        user = User(
+            username = 'eduhmik',
+            email = 'edwinkimaita@gmail.com',
+            password = '1234',
+            phone = '0718433329',
+            role = 'admin'
+        )
+
+        auth_token = user.encode_auth_token(user.email, user.role)
+        self.assertTrue(isinstance(auth_token, bytes))
+        self.assertTrue(User.decode_auth_token(auth_token)['role'] == 'admin')
