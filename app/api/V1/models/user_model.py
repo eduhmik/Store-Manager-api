@@ -57,14 +57,14 @@ class User():
                 'sub': email,
                 'role':role
             }
-            print (payload)
+            
             token = jwt.encode(
                 payload,
                 secret_key,
                 algorithm='HS256'
             )
             return token
-            print(token)
+
         except Exception as e:
             return e 
 
