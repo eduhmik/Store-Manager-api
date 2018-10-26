@@ -4,9 +4,9 @@ from functools import wraps
 from app.api.V1.models.user_model import User
 from flask import request, jsonify, make_response
 
-
 def admin_required(f):
     @wraps(f)
+    @classmethod
     def decorated(*args, **kwargs):
         auth_token = None
         authentication_header = request.headers.get('Authorization')
@@ -41,6 +41,7 @@ def admin_required(f):
 
 def token_required(j):
     @wraps(j)
+    @classmethod
     def decorated_token(*args, **kwargs):
         auth_token = None
         authentication_header = request.headers.get('Authorization')

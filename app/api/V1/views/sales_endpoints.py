@@ -26,7 +26,7 @@ class SalesEndpoint(Resource):
 })
     @api.expect(sales_fields)
     @api.doc(security='apikey')
-    @admin_required
+    @token_required
     def post(self):
         """ Create new sale """
         args = parser.parse_args()
@@ -55,11 +55,11 @@ class SalesEndpoint(Resource):
         }), 200)
 
 @api.route('/<int:sales_id>')
-@admin_required
 class GetSingleSale(Resource):
     """Get single sale""" 
     
     @api.doc(security='apikey')
+    @admin_required
     def get(self, sales_id):
         """Get a specific sale when provided with an id"""
         single_sale = Sales.get_single_sale(self, sales_id) 
