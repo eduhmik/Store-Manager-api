@@ -33,6 +33,9 @@ Store Manager is a web application that helps store owners manage sales and prod
 
 # Screenshots
 * Coming soon.
+![GitHub Logo](/images/Products.PNG)
+Format: ![Alt Text](url)
+
 
 # Authors
 * **Edwin Kimaita** - *Initial work* - [Eduhmik](https://github.com/Eduhmik)
