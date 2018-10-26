@@ -13,10 +13,11 @@ app.config['JWT_BLACKLIST_TOKEN_CHECKS'] = ['access', 'refresh']
 
 jwt = JWTManager(app)
 
+
 @jwt.token_in_blacklist_loader
 def check_if_token_in_blacklist(decrypted_token):
     jti = decrypted_token['jti']
-    return RevokedTokenModel.is_jti_blacklisted(self, jti)
+    return RevokedTokenModel.is_jti_blacklisted(jti)
 
 if __name__=='__main__':
     app.run()

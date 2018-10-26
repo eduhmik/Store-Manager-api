@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify, Blueprint, json, make_response
-from flask_restplus import Resource, reqparse, Api, Namespace
+from flask_restplus import Resource, reqparse, Api, Namespace, fields
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required, get_jwt_identity, get_raw_jwt)
 from ..models.user_model import User
 from ..models.revoked_token_model import RevokedTokenModel
-api = Namespace('regiser_endpoints', description='A collection of endpoints for the user model; includes get and post endpoints')
+
+api = Namespace('register_endpoints', description='A collection of register endpoints for the user model')
+ns = Namespace('users', description='Users endpoints to fetch all users and delete them')
 
 parser = reqparse.RequestParser()
 parser.add_argument('username', help = 'This field cannot be blank', required = True)
@@ -15,6 +17,14 @@ parser.add_argument('password', help = 'This field cannot be blank', required = 
 """user regitration"""
 @api.route('')
 class UserRegistration(Resource):
+    registration_fields = api.model('User/Registration', {
+    'username' : fields.String,
+    'email': fields.String,
+    'phone' : fields.String,
+    'role': fields.String,
+    'password': fields.String
+})
+    @api.doc(body=registration_fields)
     def post(self):
         args = parser.parse_args()
         username = args['username']
@@ -46,7 +56,8 @@ class UserRegistration(Resource):
       
 
       
-"""fetch all users"""    
+"""fetch all users""" 
+@ns.route('')   
 class AllUsers(Resource):
     def get(self):
         users_list = User.get_all_users(self)

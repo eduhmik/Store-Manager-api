@@ -6,8 +6,6 @@ from unittest import TestCase
 from app import create_app
 
 
-
-
 class BaseTest(TestCase):
     """
     Class to hold all similar test config
