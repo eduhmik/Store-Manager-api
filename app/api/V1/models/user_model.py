@@ -3,10 +3,9 @@ from app.instance.config import secret_key
 from datetime import datetime, timedelta
 import jwt
 
-user_id = 1
-users = []
-
 class User():
+    user_id = 1
+    users = []
 
     def __init__(self, email, password, username, role, phone):
         self.username = username
@@ -17,27 +16,26 @@ class User():
 
     def create_user(self):
         user = dict(
-            email = self.email,
-            password = self.password,
             username = self.username,
+            email = self.email,
+            password = self.password, 
             role = self.role,
             phone = self.phone
         )
-        users.append(user)
+        User.users.append(user)
         return user
         
-    @staticmethod
-    def get_single_user(email):
+    
+    def get_single_user(self, email):
         """Retrieve user details by email"""
-
-        single_user = [user for user in users if user['email'] == email]
+        single_user = [user for user in User.users if user['email'] == email]
         if single_user:
             return single_user[0]
         return 'not found'
 
 
     def get_all_users(self):
-        return users
+        return User.users
 
    
 
@@ -59,11 +57,14 @@ class User():
                 'sub': email,
                 'role':role
             }
-            return jwt.encode(
+            print (payload)
+            token = jwt.encode(
                 payload,
                 secret_key,
                 algorithm='HS256'
             )
+            return token
+            print(token)
         except Exception as e:
             return e 
 
@@ -73,6 +74,7 @@ class User():
         
         try:
             payload = jwt.decode(auth_token, secret_key, options={'verify_iat': False})
+            # print (payload)
             return payload
         except jwt.ExpiredSignatureError:
             return {'message': 'Signature expired. Please log in again.'}

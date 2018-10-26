@@ -29,7 +29,6 @@ class SalesEndpoint(Resource):
 
         #User authentication
         authentication_header = request.headers.get('Authorization') 
-
         if authentication_header:
             try:
                 auth_token = authentication_header.split(" ")[1]
@@ -63,13 +62,14 @@ class SalesEndpoint(Resource):
     @api.doc(security='apikey')
     def get(self):
         """Get all sales"""
-    
         """User authentication"""
         authentication_header = request.headers.get('Authorization')
-        if authentication_header:
+        if authentication_header:    
             try:
                 auth_token = authentication_header.split(" ")[1]
+                    
                 identity = User.decode_auth_token(auth_token)
+                print(identity)
                 if identity == 'Invalid token. Please log in again.':
                     return make_response(jsonify({
                         'status': 'failed',
@@ -81,12 +81,20 @@ class SalesEndpoint(Resource):
                     'status': 'failed',
                     'message': 'You are not authorized'
                 }), 401)
+                
             if auth_token:
                 if identity['role'] == 'attendant':
                     return make_response(jsonify({
                         'status': 'failed',
                         'message': 'You are not an admin'
                     }), 401)
+                sales = Sales.get_all_sales(self)
+                if len(sales) == 0:
+                    return make_response(jsonify({
+                        'message':  'No sales record. Make a sale orde',
+                        'status': 'ok',
+                        'sales': sales
+                    }), 200)      
                 sales = Sales.get_all_sales(self)
                 return make_response(jsonify({
                     'message':  'success',
@@ -97,7 +105,6 @@ class SalesEndpoint(Resource):
 @api.route('/<int:sales_id>')
 class GetSingleSale(Resource):
     """Get single sale""" 
-    
     @api.doc(security='apikey')
     def get(self, sales_id):
         """Get a specific sale when provided with an id"""
@@ -107,6 +114,7 @@ class GetSingleSale(Resource):
             try:
                 auth_token = authentication_header.split(" ")[1]
                 identity = User.decode_auth_token(auth_token)
+                print(identity)
                 if identity == 'Invalid token. Please sign in again':
                     return make_response(jsonify({
                         'status': 'failed',

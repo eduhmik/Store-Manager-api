@@ -36,7 +36,7 @@ class ProductEndpoint(Resource):
                 auth_token = authentication_header.split(" ")[1]
                     
                 identity = User.decode_auth_token(auth_token)
-                
+                print(identity)
                 if identity == 'Invalid token. Please log in again.':
                     return make_response(jsonify({
                         'status': 'failed',
