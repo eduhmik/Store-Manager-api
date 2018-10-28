@@ -31,7 +31,11 @@ class UserLogin(Resource):
         password = args['password']
                 
         try:
+<<<<<<< HEAD
+            current_user = User.get_single_user(email)
+=======
             current_user = User.get_single_user(self, email)
+>>>>>>> develop
             if current_user == 'not found':
                 return make_response(jsonify({
                     'status': 'success',

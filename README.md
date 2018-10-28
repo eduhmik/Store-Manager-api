@@ -32,7 +32,42 @@ Store Manager is a web application that helps store owners manage sales and prod
 * Install dependencies by running 'pip install -r requirements.txt
 
 # Screenshots
-* Coming soon.
+
+1. Sample Products Request
+![GitHub Logo](/images/Products.PNG)
+Format: ![Alt Text](url)
+
+2. Sample Sales Request
+![GitHub Logo](/images/Sales.PNG)
+Format: ![Alt Text](url)
+
+3. Sample Registration Request
+![GitHub Logo](/images/Registration.PNG)
+Format: ![Alt Text](url)
+
+4. Sample Users Request
+![GitHub Logo](/images/Users.PNG)
+Format: ![Alt Text](url)
+
+5. Sample Login Request
+![GitHub Logo](/images/Login.PNG)
+Format: ![Alt Text](url)
+
 
 # Authors
 * **Edwin Kimaita** - *Initial work* - [Eduhmik](https://github.com/Eduhmik)
+
+
+
+
+Endpoint                   | Functionality                |
+-------------------------- | -----------------------------
+GET /products | Fetch all products           
+GET /products/<productId> | Fetch a single product record
+GET /sales | Fetch all sale records       
+GET /sales/<saleId> | Fetch a single sale record   
+POST /products | Create a product             
+POST /sales | Create a sale order          
+POST /auth/register | Register a user
+POST /auth/login | Login a user                 
+
