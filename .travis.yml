@@ -1,0 +1,19 @@
+language: python
+python:
+  - "3.6"
+
+script:    
+  - pytest --cov=app/api
+  - coveralls
+
+env:
+  - export SECRET_KEY='This is my secret key'
+
+after_success:
+  - coveralls
+  - codeclimate-test-reporter
+
+install:    
+  - pip install -r requirements.txt
+  - pip install coveralls
+  - pip install codeclimate-test-reporter

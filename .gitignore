@@ -47,6 +47,12 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 # Translations
 *.mo
 *.pot
@@ -57,7 +63,7 @@ local_settings.py
 db.sqlite3
 
 # Flask stuff:
-instance/
+
 .webassets-cache
 
 # Scrapy stuff:
