@@ -1,14 +1,9 @@
 
 # Store-Manager-api
-<<<<<<< HEAD
 [![Build Status](https://travis-ci.org/eduhmik/Store-Manager-api.svg?branch=ft-auth-jwt-api-161342719)](https://travis-ci.org/eduhmik/Store-Manager-api)
 [![Coverage Status](https://coveralls.io/repos/github/eduhmik/Store-Manager-api/badge.svg?branch=ft-auth-jwt-api-161342719)](https://coveralls.io/github/eduhmik/Store-Manager-api?branch=master)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/883774545d4244c292db2f22d18eac1e)](https://www.codacy.com/app/eduhmik/Store-Manager-api?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=eduhmik/Store-Manager-api&amp;utm_campaign=Badge_Grade)
 
-=======
-
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/219d9e869fc5482f9cf897465be5d5c5)](https://app.codacy.com/app/eduhmik/Store-Manager-api?utm_source=github.com&utm_medium=referral&utm_content=eduhmik/Store-Manager-api&utm_campaign=Badge_Grade_Dashboard)
->>>>>>> master
 
 Store Manager is a web application that helps store owners manage sales and product inventory records. This application is meant for use in a single store. This is an api to help interact with the application in other platforms.
 
