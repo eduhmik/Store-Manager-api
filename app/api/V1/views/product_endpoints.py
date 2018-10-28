@@ -29,6 +29,7 @@ class ProductEndpoint(Resource):
     @admin_required
     def post(self):
         """ Create a new product """
+<<<<<<< HEAD
         args = parser.parse_args()
         product_name = args['product_name']
         category = args['category']
@@ -43,6 +44,51 @@ class ProductEndpoint(Resource):
             'message': 'product created successfully',
             'product': created_product
         }), 201)
+=======
+
+        """User authentication"""
+        authentication_header = request.headers.get('Authorization')
+        if authentication_header:    
+            try:
+                auth_token = authentication_header.split(" ")[1]
+                    
+                identity = User.decode_auth_token(auth_token)
+                print(identity)
+                if identity == 'Invalid token. Please log in again.':
+                    return make_response(jsonify({
+                        'status': 'failed',
+                        'message': 'Invalid token. Please log in again.'
+                    }), 401)
+
+            except Exception:
+                return make_response(jsonify({
+                    'status': 'failed',
+                    'message': 'You are not authorized'
+                }), 401)
+                
+            if auth_token:
+                
+                if identity['role'] == 'attendant':
+                    return make_response(jsonify({
+                        'status': 'failed',
+                        'message': 'You are not an admin'
+                    }), 401)
+
+                args = parser.parse_args()
+                product_name = args['product_name']
+                category = args['category']
+                quantity = args['quantity']
+                reoder_level = args['reorder_level']
+                price = args['price']
+
+                new_product = Product(product_name, category, quantity, reoder_level, price)
+                created_product = new_product.create_product()
+                return make_response(jsonify({
+                    'status': 'ok',
+                    'message': 'product created successfully',
+                    'product': created_product
+                }), 201)
+>>>>>>> develop
        
     @api.doc(security='apikey')
     @token_required

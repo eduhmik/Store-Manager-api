@@ -16,19 +16,22 @@ class User():
 
     def create_user(self):
         user = dict(
-            email = self.email,
-            password = self.password,
             username = self.username,
+            email = self.email,
+            password = self.password, 
             role = self.role,
             phone = self.phone
         )
         User.users.append(user)
         return user
         
-    @staticmethod
-    def get_single_user(email):
+    
+    def get_single_user(self, email):
         """Retrieve user details by email"""
+<<<<<<< HEAD
 
+=======
+>>>>>>> develop
         single_user = [user for user in User.users if user['email'] == email]
         if single_user:
             return single_user[0]
@@ -58,11 +61,14 @@ class User():
                 'sub': email,
                 'role':role
             }
-            return jwt.encode(
+            
+            token = jwt.encode(
                 payload,
                 secret_key,
                 algorithm='HS256'
             )
+            return token
+
         except Exception as e:
             return e 
 
@@ -72,6 +78,7 @@ class User():
         
         try:
             payload = jwt.decode(auth_token, secret_key, options={'verify_iat': False})
+            # print (payload)
             return payload
         except jwt.ExpiredSignatureError:
             return {'message': 'Signature expired. Please log in again.'}
