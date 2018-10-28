@@ -1,6 +1,7 @@
+#Library imports
+
 from flask_restplus import Api
 from flask import Blueprint 
-
 
 # Import all endpoints for all models
 from .views.product_endpoints import api as product_namespace

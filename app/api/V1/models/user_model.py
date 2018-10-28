@@ -28,10 +28,6 @@ class User():
     
     def get_single_user(self, email):
         """Retrieve user details by email"""
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
         single_user = [user for user in User.users if user['email'] == email]
         if single_user:
             return single_user[0]
