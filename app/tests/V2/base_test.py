@@ -45,6 +45,7 @@ class BaseTest(TestCase):
     def tearDown(self):
         '''Remove test variables and clear the test database'''
         db_connection = app_config['testing'].DATABASE_CONNECTION_URL
+        print (db_connection)
         connection = psycopg2.connect(db_connection)
         cursor = connection.cursor()
         cursor.execute("DROP TABLE test_users")

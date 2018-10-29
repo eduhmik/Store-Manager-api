@@ -3,9 +3,9 @@ import json
 # Local application imports
 from .base_test import BaseTest
 
-login_url = "/api/v1/auth/login"
-reg_url = "/api/v1/auth/signup"
-products_url = "/api/v1/products"
+login_url = "/api/v2/auth/login"
+reg_url = "/api/v2/auth/signup"
+products_url = "/api/v2/products"
 class TestGetProducts(BaseTest):
     """
     Product data
