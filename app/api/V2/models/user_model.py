@@ -1,6 +1,5 @@
 from passlib.hash import pbkdf2_sha256 as sha256
 from app.instance.config import secret_key
-from flask import jsonify, make_response
 from psycopg2.extras import RealDictCursor
 import psycopg2
 from app.db_setup import db_url

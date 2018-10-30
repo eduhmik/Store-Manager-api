@@ -3,7 +3,7 @@ from flask_restplus import Api
 from flask import Blueprint 
 
 # Import all endpoints for all models
-# from .views.product_endpoints import api as product_namespace
+from .views.product_endpoints import api as product_namespace
 # from .views.sales_endpoints import api as sales_namespace
 from .views.auth_endpoints import ns2 as userLogin_namespace
 from .views.auth_endpoints import api as userRegistration_namespace 
@@ -21,7 +21,7 @@ authorizations = {
 version2 = Blueprint('api version 2', __name__, url_prefix='/api/v2')
 api = Api(version2, title='Store manager API', version='2.0', description='An application that helps store owners manage sales and product inventory records', authorizations=authorizations)
 
-# api.add_namespace(product_namespace, path='/products')
+api.add_namespace(product_namespace, path='/products')
 # api.add_namespace(sales_namespace, path='/sales')
 api.add_namespace(userRegistration_namespace, path='/auth/signup')
 api.add_namespace(userLogin_namespace, path='/auth/login')

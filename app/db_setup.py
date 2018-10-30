@@ -2,7 +2,7 @@
 import psycopg2
 from datetime import datetime
 from app.instance.config import app_config, db_url
-# from app.api.V2.models.user_model import User
+from app.api.V2.models.user_model import User
 from psycopg2.extras import RealDictCursor
 
 
@@ -11,7 +11,6 @@ class DatabaseSetup:
     def __init__(self, config_name):
         self.db_url = db_url
         self.db_connection = psycopg2.connect(self.db_url)
-        print(self.db_connection)
 
     def create_tables(self):
         db_connection = self.db_connection
@@ -37,14 +36,20 @@ class DatabaseSetup:
     def create_app_admin(self):
         db_connection = self.db_connection
         cursor = self.db_connection.cursor()
-        pwd = '1234'
+        pwd = User.generate_hash('1234')
+        # stored_user_query = """
+        #             SELECT * from users WHERE username=%s
+        #             """
+        # cursor.execute(stored_user_query,('Eduhmik',))
+        # admin=cursor.fetchone()
+        # if not admin:
         query = """
         INSERT INTO users(username, email, phone, role, password)
-        VALUES(%s,%s,%s,%s,%s);
+        VALUES(%s,%s,%s,%s,%s)
         """
 
         cursor.execute(query, ('Eduhmik', 'edwinkimaita78@gmail.com', 
-                                '0718433329', pwd, 'admin'))
+                                '0718433329','admin', pwd))
                             
         db_connection.commit()
 
@@ -70,19 +75,20 @@ class DatabaseSetup:
         )
         """
 
-        query2 = """CREATE TABLE IF NOT EXISTS products(
+        query2 = """CREATE TABLE IF NOT EXISTS sales(
             sales_id            SERIAL PRIMARY KEY,
             product_name        VARCHAR(50)     UNIQUE NOT NULL,
             quantity            INT     NOT NULL,
-            total               VARCHAR(10)     NOT NULL,
+            total               REAL     NOT NULL,
             seller              VARCHAR(30)     NOT NULL,
             created_on timestamp with time zone DEFAULT ('now'::text)::date NOT NULL  
         )
         """
 
-        query3 = """CREATE TABLE IF NOT EXISTS sales(
+        query3 = """CREATE TABLE IF NOT EXISTS products(
             product_id          SERIAL PRIMARY KEY,
             product_name        VARCHAR(50)     UNIQUE NOT NULL,
+            category            VARCHAR(50),
             quantity            INT     NOT NULL,
             reorder_level       INT     NOT NULL,
             price               REAL     NOT NULL,
