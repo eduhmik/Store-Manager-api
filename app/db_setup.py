@@ -1,15 +1,17 @@
 '''class to configure the database'''
 import psycopg2
 from datetime import datetime
-from app.api.V2.models.user_model import User
+from app.instance.config import app_config, db_url
+# from app.api.V2.models.user_model import User
 from psycopg2.extras import RealDictCursor
-from app.instance.config import app_config
+
 
 class DatabaseSetup:
     """Initialize a db connection"""
-    def __init__(self, app_config):
-        db_url = app_config[app_config].DATABASE_CONNECTION_URL
-        self.db_connection = psycopg2.connect(db_url)
+    def __init__(self, config_name):
+        self.db_url = db_url
+        self.db_connection = psycopg2.connect(self.db_url)
+        print(self.db_connection)
 
     def create_tables(self):
         db_connection = self.db_connection
@@ -30,46 +32,12 @@ class DatabaseSetup:
         for query in queries:
             cursor.execute(query)
         db_connection.commit()
-
-    def initialize_database_tables(self):
-        query = """CREATE TABLE IF NOT EXISTS users(
-            id          SERIAL PRIMARY KEY,
-            username    VARCHAR(50)     UNIQUE NOT NULL,
-            email       VARCHAR(80)     NOT NULL,
-            phone       VARCHAR(10)     NOT NULL,
-            role        VARCHAR(30)     NOT NULL,
-            password    VARCHAR(50)     NOT NULL,
-            created_on timestamp with time zone DEFAULT ('now'::text)::date NOT NULL  
-        )
-        """
-
-        query2 = """CREATE TABLE IF NOT EXISTS products(
-            sales_id          SERIAL PRIMARY KEY,
-            product_name    VARCHAR(50)     UNIQUE NOT NULL,
-            quantity       INT     NOT NULL,
-            total       VARCHAR(10)     NOT NULL,
-            seller        VARCHAR(30)     NOT NULL,
-            created_on timestamp with time zone DEFAULT ('now'::text)::date NOT NULL  
-        )
-        """
-
-        query3 = """CREATE TABLE IF NOT EXISTS sales(
-            product_id          SERIAL PRIMARY KEY,
-            product_name    VARCHAR(50)     UNIQUE NOT NULL,
-            quantity       VARCHAR(80)     NOT NULL,
-            reorder_level       VARCHAR(10)     NOT NULL,
-            price        VARCHAR(30)     NOT NULL,
-            created_on timestamp with time zone DEFAULT ('now'::text)::date NOT NULL  
-        )
-        """
-
-        queries = [query, query2, query3]
-        return queries
+        
 
     def create_app_admin(self):
         db_connection = self.db_connection
         cursor = self.db_connection.cursor()
-        pwd = User.generate_hash('1234')
+        pwd = '1234'
         query = """
         INSERT INTO users(username, email, phone, role, password)
         VALUES(%s,%s,%s,%s,%s);
@@ -81,6 +49,7 @@ class DatabaseSetup:
         db_connection.commit()
 
     def cursor(self):
+        '''Holds temporal data being executed from or to the database'''
         cursor = self.db_connection.cursor(cursor_factory=RealDictCursor)
         return cursor
 
@@ -88,4 +57,38 @@ class DatabaseSetup:
         '''commits changes to database'''
         db_connection = self.db_connection()
         db_connection.commit()
-    
+
+    def initialize_database_tables(self):
+        query = """CREATE TABLE IF NOT EXISTS users(
+            id          SERIAL PRIMARY KEY,
+            username    VARCHAR(50)     UNIQUE NOT NULL,
+            email       VARCHAR(80)     NOT NULL,
+            phone       VARCHAR(10)     NOT NULL,
+            role        VARCHAR(30)     NOT NULL,
+            password    VARCHAR(200)     NOT NULL,
+            created_on timestamp with time zone DEFAULT ('now'::text)::date NOT NULL  
+        )
+        """
+
+        query2 = """CREATE TABLE IF NOT EXISTS products(
+            sales_id            SERIAL PRIMARY KEY,
+            product_name        VARCHAR(50)     UNIQUE NOT NULL,
+            quantity            INT     NOT NULL,
+            total               VARCHAR(10)     NOT NULL,
+            seller              VARCHAR(30)     NOT NULL,
+            created_on timestamp with time zone DEFAULT ('now'::text)::date NOT NULL  
+        )
+        """
+
+        query3 = """CREATE TABLE IF NOT EXISTS sales(
+            product_id          SERIAL PRIMARY KEY,
+            product_name        VARCHAR(50)     UNIQUE NOT NULL,
+            quantity            INT     NOT NULL,
+            reorder_level       INT     NOT NULL,
+            price               REAL     NOT NULL,
+            created_on timestamp with time zone DEFAULT ('now'::text)::date NOT NULL  
+        )
+        """
+
+        queries = [query, query2, query3]
+        return queries
