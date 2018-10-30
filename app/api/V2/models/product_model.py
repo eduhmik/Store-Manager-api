@@ -1,7 +1,6 @@
 from psycopg2.extras import RealDictCursor
 import psycopg2
 from app.db_setup import db_url
-from datetime import datetime, timedelta
 
 """ product model class and various functions"""
 class Product():
@@ -14,7 +13,7 @@ class Product():
         self.price = price
 
     def create_product(self):
-        """Method to create a new product into list"""
+        """Method to create a new product into db"""
         product_item = dict(
             product_name = self.product_name,
             category = self.category,
