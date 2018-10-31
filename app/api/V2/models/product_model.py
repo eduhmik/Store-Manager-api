@@ -63,7 +63,20 @@ class Product():
         if product:
             return product
         return {"message": "There is no product found"}
-    
+
+    def get_product_by_name(self, product_name, quantity):
+        """Method to get a single product by name"""
+        query = """
+                SELECT * FROM products 
+                WHERE product_name=%s; 
+                """
+        conn = psycopg2.connect(db_url)
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(query,(product_name,))
+        product = cur.fetchone()
+        if product:
+            return product
+     
     def update_product(self, product_id):
         product_item = dict(
             product_name = self.product_name,

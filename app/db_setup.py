@@ -1,10 +1,13 @@
 '''class to configure the database'''
+import os
 import psycopg2
 from datetime import datetime
 from app.instance.config import app_config, db_url
 from app.api.V2.models.user_model import User
 from psycopg2.extras import RealDictCursor
 
+ENVIRONMENT = os.environ['ENV']
+url = app_config[ENVIRONMENT].DATABASE_URL
 
 class DatabaseSetup:
     """Initialize a db connection"""
@@ -21,9 +24,9 @@ class DatabaseSetup:
         db_connection.commit()
 
     def drop_tables(self):
-        table1="""DROP TABLE IF EXISTS test_users CASCADE"""
-        table2="""DROP TABLE IF EXISTS test_sales CASCADE"""
-        table3="""DROP TABLE IF EXISTS test_products CASCADE"""
+        table1="""DROP TABLE IF EXISTS users CASCADE"""
+        table2="""DROP TABLE IF EXISTS products CASCADE"""
+        table3="""DROP TABLE IF EXISTS sales CASCADE"""
         
         db_connection = self.db_connection
         cursor = self.db_connection.cursor()
@@ -66,8 +69,8 @@ class DatabaseSetup:
     def initialize_database_tables(self):
         query = """CREATE TABLE IF NOT EXISTS users(
             id          SERIAL PRIMARY KEY,
-            username    VARCHAR(50)     UNIQUE NOT NULL,
-            email       VARCHAR(80)     NOT NULL,
+            username    VARCHAR(50)     NOT NULL,
+            email       VARCHAR(80)     UNIQUE NOT NULL,
             phone       VARCHAR(10)     NOT NULL,
             role        VARCHAR(30)     NOT NULL,
             password    VARCHAR(200)     NOT NULL,
@@ -77,7 +80,7 @@ class DatabaseSetup:
 
         query2 = """CREATE TABLE IF NOT EXISTS sales(
             sales_id            SERIAL PRIMARY KEY,
-            product_name        VARCHAR(50)     UNIQUE NOT NULL,
+            product_name        VARCHAR(50)     NOT NULL,
             quantity            INT     NOT NULL,
             total               REAL     NOT NULL,
             seller              VARCHAR(30)     NOT NULL,

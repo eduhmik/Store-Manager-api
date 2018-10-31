@@ -36,13 +36,24 @@ class SalesEndpoint(Resource):
         total = args['total']
         seller = args['seller']
 
-        new_sale = Sales(product_name, quantity, total, seller)
-        created_sale = new_sale.create_sale()
-        return make_response(jsonify({
-            'status': 'ok',
-            'message': 'Sale created successfully',
-            'sales': created_sale
-        }), 201)
+        product = Sales.get_product_by_name(self, product_name)
+        if product:
+            qty = product['quantity']
+            rem_quantity = int(qty)
+            if rem_quantity == 0:
+                return make_response(jsonify({'message': 'Product is not available'}), 404)
+            if rem_quantity >= int(quantity): 
+                rem_quantity = rem_quantity - int(quantity)
+                new_sale = Sales(product_name, quantity, total, seller)
+                created_sale = new_sale.create_sale()
+                return make_response(jsonify({
+                    'status': 'ok',
+                    'message': 'Sale created successfully',
+                    'sales': created_sale
+                }), 201)
+            
+            return make_response(jsonify({'message': 'The product you are trying to sell is higher than the stock level.\
+    The remaining quantity is {}'.format(rem_quantity)}), 401)
 
     @api.doc(security='apikey')
     @admin_required

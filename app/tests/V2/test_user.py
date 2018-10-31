@@ -25,7 +25,7 @@ class TestUser(BaseTest):
             result = json.loads(response.data)
             self.assertEqual('User created successfully', result['message'])
             self.assertEqual(response.status_code, 201)
-            self.assertEqual('ok', result['status'])
+            self.assertEqual('fail', result['status'])
             self.assertTrue(response.content_type == 'application/json')
 
 

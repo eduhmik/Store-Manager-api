@@ -16,7 +16,8 @@ class Testing(Config):
     '''Congigurations for testing'''
     TESTING = True
     DEBUG = True
-    DATABASE_CONNECTION_URL = "dbname = 'test_store_manager' user = 'postgres' host='localhost' port ='5432'"
+    os.environ['ENV']='testing'
+    DATABASE_URL = "dbname = 'test_store_manager' user = 'postgres' host='localhost' port ='5432'"
 
 class Production(Config):
     '''Congigurations for production'''
