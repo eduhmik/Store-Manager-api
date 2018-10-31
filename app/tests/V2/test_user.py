@@ -14,8 +14,8 @@ class TestUser(BaseTest):
     def test_create_user(self):
         with self.client():
             response = self.client().post(reg_url, data=json.dumps(dict(
-                username = 'Eduhmik',
-                email = 'edwinkimaita@gmail.com',
+                username = 'Mikkie',
+                email = 'edwinkimaita9@gmail.com',
                 phone = '0718433329',
                 role = 'admin',
                 password = '1234'
@@ -75,8 +75,8 @@ class TestUser(BaseTest):
         with self.client():
             #User registration
             response = self.client().post(reg_url, data=json.dumps(dict(
-                username = 'Eduhmik',
-                email = 'edwinkimaita2@gmail.com',
+                username = 'eddie',
+                email = 'edwinkimaita22@gmail.com',
                 phone = '0718433329',
                 role = 'admin',
                 password = '12345'
@@ -92,7 +92,7 @@ class TestUser(BaseTest):
 
             #Registered user login
             response2 = self.client().post(login_url, data=json.dumps(dict(
-                email = 'edwinkimaita2@gmail.com',
+                email = 'edwinkimaita22@gmail.com',
                 password = '12345'
             )), 
             content_type = 'application/json'

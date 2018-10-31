@@ -81,9 +81,7 @@ class UserRegistration(Resource):
         phone = args['phone']
         role = args['role']
         password = args['password']
-        print(email)
         existing_user = User.get_single_user(email)
-        print(existing_user)
         if existing_user == {"message": "There are no records found"}:
             
             try:    

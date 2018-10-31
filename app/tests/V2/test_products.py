@@ -11,12 +11,25 @@ class TestGetProducts(BaseTest):
     Product data
     """
     product_data = {
-        "product_id" : 2,
-        "product_name": "Home Theatre",
+        "product_name": "Shaving",
         "category": "Electronics",
         "quantity": 5,
         "reorder_level": 3,
         "price": 7999
+    }
+    product_data2 = {
+        "product_name": "Oreo",
+        "category": "Foodstuffs",
+        "quantity": 50,
+        "reorder_level": 10,
+        "price": 120
+    }
+    product_data3 = {
+        "product_name": "Gentle",
+        "category": "Detergents",
+        "quantity": 50,
+        "reorder_level": 5,
+        "price": 150
     }
     
     def test_post_product(self):
@@ -25,8 +38,8 @@ class TestGetProducts(BaseTest):
             self.user_auth_register()
             resp = self.user_auth_login()
 
-            auth_token = json.loads(resp.data.decode())['auth_token']
-
+            res = json.loads(resp.data.decode())
+            auth_token = res['auth_token']
             post_product = self.client().post(products_url, headers=dict(Authorization="Bearer {}".format(auth_token)),
             data = self.product_data)
             result = json.loads(post_product.data)
@@ -41,10 +54,10 @@ class TestGetProducts(BaseTest):
             self.user_auth_register()
             resp = self.user_auth_login()
 
-            auth_token = json.loads(resp.data)['auth_token']
+            auth_token = json.loads(resp.data.decode())['auth_token']
 
             post_product = self.client().post(products_url, headers=dict(Authorization="Bearer {}".format(auth_token)), 
-            data=self.product_data)
+            data=self.product_data3)
             result = json.loads(post_product.data)
             self.assertEqual(post_product.status_code, 201)
             self.assertEqual('product created successfully', result['message'])
@@ -61,10 +74,10 @@ class TestGetProducts(BaseTest):
             self.user_auth_register()
             resp = self.user_auth_login()
 
-            auth_token = json.loads(resp.data)['auth_token']
+            auth_token = json.loads(resp.data.decode())['auth_token']
 
             post_product = self.client().post(products_url, headers=dict(Authorization="Bearer {}".format(auth_token)), 
-            data=self.product_data)
+            data=self.product_data2)
             result = json.loads(post_product.data)
             self.assertEqual(post_product.status_code, 201)
             self.assertEqual('product created successfully', result['message'])

@@ -11,18 +11,28 @@ class TestSales(BaseTest):
     Sales data
     """
     sales_data = {
-        "sales_id" : 2,
-        "product_id": 1,
-        "product_name": 'Home Theatre',
+        "product_name": 'Frsduits',
         "quantity": 1,
-        "total": 3,
+        "total": 50,
         "seller": 'john doe'
     }
-    def user_auth_register(self, email="john.doe@mail.com", phone="0718433329", role="admin", username="Eduhmik", password="1234"):
+    sales_data2 = {
+        "product_name": 'Sadelt',
+        "quantity": 2,
+        "total": 240,
+        "seller": 'john doe'
+    }
+    sales_data3 = {
+        "product_name": 'Riedce',
+        "quantity": 1,
+        "total": 150,
+        "seller": 'john doe'
+    }
+    def user_auth_register(self, username="Eduhmik", email="john.doe@mail.com", phone="0718433329", role="admin", password="1234"):
         """authenticate user"""
         reg_data = {
-            'email':email,
             'username':username,
+            'email':email,
             'phone':phone,
             'role':role,
             'password': password
@@ -61,7 +71,7 @@ class TestSales(BaseTest):
             auth_token = json.loads(resp.data.decode())['auth_token']
 
             post_sale = self.client().post(sales_url, headers=dict(Authorization="Bearer {}".format(auth_token)),
-            data = self.sales_data)
+            data = self.sales_data2)
             """Asserts test return true status_code and message"""
             result = json.loads(post_sale.data)
             self.assertEqual('Sale created successfully', result['message'])
@@ -83,14 +93,14 @@ class TestSales(BaseTest):
             auth_token = json.loads(resp.data.decode())['auth_token']
 
             post_sale = self.client().post(sales_url, headers=dict(Authorization="Bearer {}".format(auth_token)),
-            data = self.sales_data)
+            data = self.sales_data3)
             """Asserts test return true status_code and message"""
             result = json.loads(post_sale.data)
             self.assertEqual('Sale created successfully', result['message'])
             self.assertEqual(post_sale.status_code, 201)
 
             single_sale = self.client().get(
-                '/api/v2/sales/{}'.format(result['sales']['sales_id']))
+                '/api/v2/sales/{}'.format(result[0]['sales_id']))
             self.assertEqual(single_sale.status_code, 200)
 
             
