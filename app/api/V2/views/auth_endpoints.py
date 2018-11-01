@@ -164,15 +164,15 @@ class UserLogoutAccess(Resource):
                     'status': 'failed',
                     'message': 'You are not authorized'
                 }), 401)
-                try:
-                    if auth_token:
-                        revoked_token = RevokedTokenModel(auth_token = auth_token)
-                        revoked_token.add()
-                        return make_response(jsonify({
-                            'message': 'Authentication token has been revoked'
-                }))
-                except:
+            try:
+                if auth_token:
+                    revoked_token = RevokedTokenModel(auth_token = auth_token)
+                    revoked_token.add()
                     return make_response(jsonify({
-                    'message': 'Something unexpected happened'
-                }), 500)
+                        'message': 'Authentication token has been revoked'
+            }))
+            except:
+                return make_response(jsonify({
+                'message': 'Something unexpected happened'
+            }), 500)
 
