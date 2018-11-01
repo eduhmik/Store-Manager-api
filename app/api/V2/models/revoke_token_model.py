@@ -9,7 +9,7 @@ class RevokedTokenModel():
         self.auth_token = auth_token
     
     def add(self):
-        query = '''INSERT INTO revoked_tokens (auth_token) VALUES (%s);'''
+        query = '''INSERT INTO revoke_tokens auth_token VALUES (%s)'''
 
         conn = psycopg2.connect(db_url)
         cur = conn.cursor(cursor_factory=RealDictCursor)
@@ -18,7 +18,7 @@ class RevokedTokenModel():
     
     @classmethod
     def is_token_blacklisted(cls, auth_token):
-        query = '''SELECT * FROM revoked_tokens WHERE auth_token = %s'''
+        query = '''SELECT * FROM revoke_tokens WHERE auth_token = %s'''
         conn = psycopg2.connect(db_url)
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute(query, (auth_token,))

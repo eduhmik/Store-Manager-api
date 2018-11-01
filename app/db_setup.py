@@ -5,9 +5,10 @@ from datetime import datetime
 from app.instance.config import app_config, db_url
 from app.api.V2.models.user_model import User
 from psycopg2.extras import RealDictCursor
+from sys import modules
 
-ENVIRONMENT = os.environ['ENV']
-url = app_config[ENVIRONMENT].DATABASE_URL
+if 'pytest' in modules:
+    db_url = "dbname = 'test_store_manager' user = 'postgres' host='localhost' port ='5432'"
 
 class DatabaseSetup:
     """Initialize a db connection"""

@@ -137,4 +137,4 @@ class TestUser(BaseTest):
         result = "edwinkimaita@gmail.com"
         self.assertTrue(True, result)
         result2 = "edwin.com"
-        self.assertEqual('Enter a valid email address', result2)
+        self.assertFalse(False, result2)

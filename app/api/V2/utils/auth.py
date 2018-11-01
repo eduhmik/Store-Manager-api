@@ -3,16 +3,24 @@ from app.instance.config import secret_key
 from functools import wraps
 from app.api.V2.models.user_model import User
 from flask import request, jsonify, make_response
+from ..models.revoke_token_model import RevokedTokenModel
 
 def admin_required(f):
     @wraps(f)
     @classmethod
     def decorated(*args, **kwargs):
         auth_token = None
+        
         authentication_header = request.headers.get('Authorization')
         if authentication_header:    
             try:
                 auth_token = authentication_header.split(" ")[1]
+
+                revoked = RevokedTokenModel.is_token_blacklisted(auth_token)
+                if revoked:
+                    return make_response(jsonify({
+                            'message': 'You are logged out. Please log in again.'
+                        }), 401)
                     
                 identity = User.decode_auth_token(auth_token)
                 
@@ -48,6 +56,12 @@ def token_required(j):
         if authentication_header:    
             try:
                 auth_token = authentication_header.split(" ")[1]
+
+                revoked = RevokedTokenModel.is_token_blacklisted(auth_token)
+                if revoked:
+                    return make_response(jsonify({
+                            'message': 'You are logged out. Please log in again.'
+                        }), 401)
                     
                 identity = User.decode_auth_token(auth_token)
                 
