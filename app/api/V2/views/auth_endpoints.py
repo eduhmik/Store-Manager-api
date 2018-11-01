@@ -89,30 +89,12 @@ class UserRegistration(Resource):
             r'^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', email)
         if not match:
             return {"message": "Enter a valid email address"}
-        elif role not in roles:
+        if role not in roles:
             return make_response(jsonify({
                 'message': 'The role can only be an admin or attendant.'
             }))
-        elif Password().check_is_valid(password):
-            # if Password().check_is_valid(password):
-            #     if Email().is_valid_email(email):
-            existing_user = User.get_single_user(email)
-            if existing_user == {"message": "There are no records found"}:
-                new_user = User(username, email, phone, role, User.generate_hash(password))
-                created_user = new_user.create_user()
-                return make_response(jsonify({
-                    'status': 'ok',
-                    'message': 'User created successfully',
-                    'users': created_user
-                }), 201)
+        if Password().check_is_valid(password) == 'Invalid':
             return make_response(jsonify({
-                        'status': 'fail',
-                        'message' : 'Email already exists, please log in'
-                    }))    
-            #     return make_response(jsonify({
-            #         'message': 'Enter a valid email address'
-            #     }))
-        return make_response(jsonify({
             'message': ['The password you entered is invalid password should contain',
                     {'a lowercase character':'an uppercase character', 
                         'a digit': 'a special character e.g $@*', 
@@ -120,17 +102,20 @@ class UserRegistration(Resource):
                     }
             ]
         }))
-            
-            # except Exception as e:
-            #     return make_response(jsonify({
-            #     'message' : str(e),
-            #     'status' : 'failed'
-            # }), 500)
-        
-        # return make_response(jsonify({
-        #                 'status': 'fail',
-        #                 'message' : 'Email already exists, please log in'
-        #             }))
+        existing_user = User.get_single_user(email)
+        if existing_user == {"message": "There are no records found"}:
+            new_user = User(username, email, phone, role, User.generate_hash(password))
+            created_user = new_user.create_user()
+            return make_response(jsonify({
+                'status': 'ok',
+                'message': 'User created successfully',
+                'users': created_user
+            }), 201)
+        return make_response(jsonify({
+                    'status': 'fail',
+                    'message' : 'Email already exists, please log in'
+                }))    
+           
 
 """fetch all users""" 
 @ns.route('')  
