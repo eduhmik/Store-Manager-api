@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, Blueprint, json, make_response
 from flask_restplus import Resource, reqparse, Api, Namespace, fields
 from ..models.user_model import User
+from app.api.V2.utils.validator import Password, Email
 
 
 api = Namespace('Register Endpoint', description='A collection of register endpoints for the user model')
@@ -81,23 +82,43 @@ class UserRegistration(Resource):
         phone = args['phone']
         role = args['role']
         password = args['password']
+
+        roles = ['admin', 'attendant']
+        if role not in roles:
+            return make_response(jsonify({
+                'message': 'The role can only be an admin or attendant.'
+            }))
+
         existing_user = User.get_single_user(email)
         if existing_user == {"message": "There are no records found"}:
             
-            try:    
-                new_user = User(username, email, phone, role, User.generate_hash(password))
-                created_user = new_user.create_user()
+            # try:
+            if Password.check_is_valid(self, password):
+                if Email.is_valid_email(self, email):
+                    new_user = User(username, email, phone, role, User.generate_hash(password))
+                    created_user = new_user.create_user()
+                    return make_response(jsonify({
+                        'status': 'ok',
+                        'message': 'User created successfully',
+                        'users': created_user
+                    }), 201)
                 return make_response(jsonify({
-                    'status': 'ok',
-                    'message': 'User created successfully',
-                    'users': created_user
-                }), 201)
+                    'message': 'Enter a valid email address'
+                }))
+            return make_response(jsonify({
+                'message': ['The password you entered is invalid password should contain',
+                        {'a lowercase character':'an uppercase character', 
+                          'a digit': 'a special character e.g $@*', 
+                          'length':'length not less than 6 or above 13'
+                        }
+                ]
+            }))
             
-            except Exception as e:
-                return make_response(jsonify({
-                'message' : str(e),
-                'status' : 'failed'
-            }), 500)
+            # except Exception as e:
+            #     return make_response(jsonify({
+            #     'message' : str(e),
+            #     'status' : 'failed'
+            # }), 500)
         
         return make_response(jsonify({
                         'status': 'fail',

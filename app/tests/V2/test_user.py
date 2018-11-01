@@ -128,3 +128,13 @@ class TestUser(BaseTest):
         auth_token = user.encode_auth_token(user.email, user.role)
         self.assertTrue(isinstance(auth_token, bytes))
         self.assertTrue(User.decode_auth_token(auth_token)['role'] == 'admin')
+
+    def test_check_password(self):
+        result = 'Awdt23&i'
+        self.assertTrue(True, result)
+
+    def test_is_valid_email(self):
+        result = "edwinkimaita@gmail.com"
+        self.assertTrue(True, result)
+        result2 = "edwin.com"
+        self.assertEqual('Enter a valid email address', result2)
