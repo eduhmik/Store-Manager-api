@@ -99,5 +99,12 @@ class DatabaseSetup:
         )
         """
 
-        queries = [query, query2, query3]
+        query4 = """CREATE TABLE IF NOT EXISTS revoke_tokens(
+            product_id          SERIAL PRIMARY KEY,
+            auth_token          VARCHAR(500)     NOT NULL,
+            created_on timestamp with time zone DEFAULT ('now'::text)::date NOT NULL  
+        )
+        """
+
+        queries = [query, query2, query3, query4]
         return queries
