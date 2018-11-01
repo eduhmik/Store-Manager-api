@@ -4,6 +4,7 @@ from ..models.user_model import User
 from ..models.revoke_token_model import RevokedTokenModel
 from app.api.V2.utils.validator import Password, Email
 from app.api.V2.utils.auth import admin_required
+import re
 
 
 api = Namespace('Register Endpoint', description='A collection of register endpoints for the user model')
@@ -87,35 +88,31 @@ class UserRegistration(Resource):
         password = args['password']
 
         roles = ['admin', 'attendant']
+        match = re.match(
+            r'^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', email)
+        if not match:
+            return {"message": "Enter a valid email address"}
         if role not in roles:
             return make_response(jsonify({
                 'message': 'The role can only be an admin or attendant.'
             }))
 
+        if len(password) < 6:
+            return make_response(jsonify({"message": "The password is too short,minimum length is 6"}), 400)
+
         existing_user = User.get_single_user(email)
         if existing_user == {"message": "There are no records found"}:
             
             try:
-                if Password.check_is_valid(self, password):
-                    if Email.is_valid_email(self, email):
-                        new_user = User(username, email, phone, role, User.generate_hash(password))
-                        created_user = new_user.create_user()
-                        return make_response(jsonify({
-                            'status': 'ok',
-                            'message': 'User created successfully',
-                            'users': created_user
-                        }), 201)
-                    return make_response(jsonify({
-                        'message': 'Enter a valid email address'
-                    }))
+                
+                new_user = User(username, email, phone, role, User.generate_hash(password))
+                created_user = new_user.create_user()
                 return make_response(jsonify({
-                    'message': ['The password you entered is invalid password should contain',
-                            {'a lowercase character':'an uppercase character', 
-                            'a digit': 'a special character e.g $@*', 
-                            'length':'length not less than 6 or above 13'
-                            }
-                    ]
-                }))
+                    'status': 'ok',
+                    'message': 'User created successfully',
+                    'users': created_user
+                }), 201)
+                    
             
             except Exception as e:
                 return make_response(jsonify({
