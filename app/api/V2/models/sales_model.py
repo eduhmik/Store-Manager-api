@@ -20,6 +20,7 @@ class Sales():
         ) 
         product = self.get_product_by_name(self.product_name)
         if product:
+            print(product)
             qty = product['quantity']
             print(qty)
             rem_quantity = int(qty) - int(self.quantity) 

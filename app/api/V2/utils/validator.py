@@ -4,12 +4,11 @@ import re
 class Password():
     """method to validate a password"""
     def check_is_valid(self, pwd):
-        special_chars = ['$', '#', '@', '!', '%', '^', '&', '*']
         for char in pwd:
-            if char.isdigit() and char.islower() and char.isupper() and [char for char in pwd if char in special_chars] and len(pwd) in range(6, 13):
+            if char.isdigit() and char.islower() and char.isupper() and len(pwd) in range(6, 13):
                 return True
             return 'invalid'
-        return pwd
+        
 
 class Email():
     """method to validate an email"""
