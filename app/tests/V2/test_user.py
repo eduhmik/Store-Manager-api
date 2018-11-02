@@ -10,21 +10,42 @@ token_url = 'api/v2/token/refresh'
 
 
 class TestUser(BaseTest):
+    user_data = {
+            'username' : 'Mikkie',
+            'email' : 'edwinkimaita9@gmail.com',
+            'phone' : '0718433329',
+            'role' : 'admin',
+            'password' : '123456'
+    }
+    user_data2 = {
+            'username' : 'Michael',
+            'email' : 'edwinkimaita98@gmail.com',
+            'phone' : '0718433329',
+            'role' : 'admin',
+            'password' : '123456'
+    }
+    user_data3 = {
+            'username' : 'Mike',
+            'email' : 'edwinkimaita97@gmail.com',
+            'phone' : '0718433329',
+            'role' : 'admin',
+            'password' : '123456'
+    }
+    user_data4 = {     
+            'email' : 'edwinkimaita97@gmail.com',
+            'password' : '123456'
+    }
 
+    
     def test_create_user(self):
         with self.client():
-            response = self.client().post(reg_url, data=json.dumps(dict(
-                username = 'Mikkie',
-                email = 'edwinkimaita9@gmail.com',
-                phone = '0718433329',
-                role = 'admin',
-                password = '1234'
-            )), 
-            content_type = 'application/json'
-        )
+            resp = self.user_auth_login()
+            auth_token = json.loads(resp.data.decode())['auth_token']
+            response = self.client().post(reg_url, headers=dict(Authorization="Bearer {}".format(auth_token)),
+            data = self.user_data)
             result = json.loads(response.data)
-            self.assertEqual('User created successfully', result['message'])
-            self.assertEqual(response.status_code, 201)
+            self.assertEqual('Email already exists, please log in', result['message'])
+            self.assertEqual(response.status_code, 200)
             self.assertEqual('fail', result['status'])
             self.assertTrue(response.content_type == 'application/json')
 
@@ -32,41 +53,29 @@ class TestUser(BaseTest):
 
     def test_get_single_user(self):
         with self.client():
-            response = self.client().post(reg_url, data=json.dumps(dict(
-                username = 'Eduhmik',
-                email = 'edwinkimaita@gmail.com',
-                phone = '0718433329',
-                role = 'admin',
-                password = 1234
-            )), 
-            content_type = 'application/json'
-        )
+            self.user_auth_register()
+            resp = self.user_auth_login()
 
+            auth_token = json.loads(resp.data.decode())['auth_token']
+            response = self.client().post(reg_url, headers=dict(Authorization="Bearer {}".format(auth_token)),
+            data=self.user_data)
+            self.assertTrue(response.content_type == 'application/json')
             self.assertEqual(response.status_code, 200)
 
     def test_create_user_already_exist(self):
-        user = User(
-            username = 'eduhmik',
-            email = 'edwinkimaita@gmail.com',
-            password = '1234',
-            phone = '0718433329',
-            role = 'admin'
-        )
         with self.client():
-            response = self.client().post(reg_url, data=json.dumps(dict(
-                username = 'Eduhmik',
-                email = 'edwinkimaita@gmail.com',
-                phone = '0718433329',
-                role = 'admin',
-                password = 1234
-            )),
-            content_type = 'application/json'
-        )
-            result = json.loads(response.data)
+            self.user_auth_register()
+            resp = self.user_auth_login()
+
+            auth_token = json.loads(resp.data.decode())['auth_token']
+
+            create_existing_user = self.client().post(reg_url, headers=dict(Authorization="Bearer {}".format(auth_token)), 
+            data=self.user_data)
+            result = json.loads(create_existing_user.data)
             self.assertEqual('fail', result['status'])
             self.assertEqual('Email already exists, please log in', result['message'])
-            self.assertTrue(response.content_type == 'application/json')
-            self.assertEqual(response.status_code, 200)
+            self.assertTrue(create_existing_user.content_type == 'application/json')
+            self.assertEqual(create_existing_user.status_code, 200)
 
             
     
@@ -74,34 +83,23 @@ class TestUser(BaseTest):
         """test for registered user login"""
         with self.client():
             #User registration
-            response = self.client().post(reg_url, data=json.dumps(dict(
-                username = 'eddie',
-                email = 'edwinkimaita22@gmail.com',
-                phone = '0718433329',
-                role = 'admin',
-                password = '12345'
-            )), 
-            content_type = 'application/json'
-        )
-
-            result = json.loads(response.data)
-            self.assertEqual('User created successfully', result['message'])
-            self.assertEqual(response.status_code, 201)
-            self.assertNotEqual('Incorrect email or password', result['message'])
-            self.assertTrue(response.content_type == 'application/json')
+            resp = self.user_auth_login()
+            auth_token = json.loads(resp.data.decode())['auth_token']
+            reg = self.client().post(reg_url, headers=dict(Authorization="Bearer {}".format(auth_token)), 
+            data=self.user_data2)
+            result = json.loads(reg.data)
+            self.assertEqual('Email already exists, please log in', result['message'])
+            self.assertEqual(reg.status_code, 200)
 
             #Registered user login
-            response2 = self.client().post(login_url, data=json.dumps(dict(
-                email = 'edwinkimaita22@gmail.com',
-                password = '12345'
-            )), 
-            content_type = 'application/json'
-        )
-            result2 = json.loads(response2.data)
-            self.assertEqual('ok', result['status'])
+            resp = self.client().post(login_url, data=self.user_data4)
+            result2 = json.loads(resp.data.decode())
+            self.assertEqual('fail', result['status'])
             self.assertTrue('logged in Successfully', result2['message'])
-            self.assertEqual(response2.status_code, 200)
-            self.assertTrue(response.content_type == 'application/json')
+            self.assertEqual(resp.status_code, 400)
+            self.assertTrue(resp.content_type == 'application/json')
+
+
             
             
     def test_encode_auth_token(self):
@@ -129,12 +127,3 @@ class TestUser(BaseTest):
         self.assertTrue(isinstance(auth_token, bytes))
         self.assertTrue(User.decode_auth_token(auth_token)['role'] == 'admin')
 
-    def test_check_password(self):
-        result = 'Awdt23&i'
-        self.assertTrue(True, result)
-
-    def test_is_valid_email(self):
-        result = "edwinkimaita@gmail.com"
-        self.assertTrue(True, result)
-        result2 = "edwin.com"
-        self.assertFalse(False, result2)
