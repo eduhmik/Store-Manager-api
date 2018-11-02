@@ -150,33 +150,29 @@ class AllUsers(Resource):
 class UserLogoutAccess(Resource):
     @ns3.doc(security='apikey')  
     def post(self):
+        auth_token = None
         authentication_header = request.headers.get('Authorization')
         if authentication_header:    
-            try:
-                auth_token = authentication_header.split(" ")[1]
-                    
-                identity = User.decode_auth_token(auth_token)
-                
-                if identity == 'Invalid token. Please log in again.':
-                    return make_response(jsonify({
-                        'status': 'failed',
-                        'message': 'Invalid token. Please log in again.'
+            auth_token = authentication_header.split(" ")[1]
+
+            revoked = RevokedTokenModel.is_token_blacklisted(auth_token)
+            if revoked:
+                return make_response(jsonify({
+                        'message': 'You are logged out. Please log in again.'
                     }), 401)
-
-            except Exception:
+            # try:
+            if auth_token:
+                revoked_token = RevokedTokenModel(auth_token = auth_token)
+                revoked_token.add()
                 return make_response(jsonify({
-                    'status': 'failed',
-                    'message': 'You are not authorized'
-                }), 401)
-            try:
-                if auth_token:
-                    revoked_token = RevokedTokenModel(auth_token = auth_token)
-                    revoked_token.add()
-                    return make_response(jsonify({
-                        'message': 'Authentication token has been revoked'
+                    'message': 'Authentication token has been revoked'
             }))
-            except:
-                return make_response(jsonify({
-                'message': 'Something unexpected happened'
-            }), 500)
-
+            # except:
+            #     return make_response(jsonify({
+            #     'message': 'Something unexpected happened'
+            # }), 500)
+        else:
+            return make_response(jsonify({
+                'status': 'failed',
+                'message': 'You are not authorized'
+            }), 401)

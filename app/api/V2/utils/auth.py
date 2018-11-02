@@ -13,15 +13,15 @@ def admin_required(f):
         
         authentication_header = request.headers.get('Authorization')
         if authentication_header:    
-            try:
-                auth_token = authentication_header.split(" ")[1]
+            
+            auth_token = authentication_header.split(" ")[1]
 
-                revoked = RevokedTokenModel.is_token_blacklisted(auth_token)
-                if revoked:
-                    return make_response(jsonify({
-                            'message': 'You are logged out. Please log in again.'
-                        }), 401)
-                    
+            revoked = RevokedTokenModel.is_token_blacklisted(auth_token)
+            if revoked:
+                return make_response(jsonify({
+                        'message': 'You are logged out. Please log in again.'
+                    }), 401)
+            try:        
                 identity = User.decode_auth_token(auth_token)
                 
                 if identity == 'Invalid token. Please log in again.':
@@ -36,11 +36,13 @@ def admin_required(f):
                         'message': 'You are not an admin'
                     }), 401)
 
-            except Exception:
-                return make_response(jsonify({
-                    'status': 'failed',
-                    'message': 'You are not authorized'
-                }), 401)
+            except Exception as e:
+                return e
+        else:
+            return make_response(jsonify({
+                'status': 'failed',
+                'message': 'You are not authorized'
+            }), 401)
         return f(*args, **kwargs)
     return decorated
 
@@ -52,15 +54,14 @@ def token_required(j):
         auth_token = None
         authentication_header = request.headers.get('Authorization')
         if authentication_header:    
-            try:
-                auth_token = authentication_header.split(" ")[1]
+            auth_token = authentication_header.split(" ")[1]
 
-                revoked = RevokedTokenModel.is_token_blacklisted(auth_token)
-                if revoked:
-                    return make_response(jsonify({
-                            'message': 'You are logged out. Please log in again.'
-                        }), 401)
-                    
+            revoked = RevokedTokenModel.is_token_blacklisted(auth_token)
+            if revoked:
+                return make_response(jsonify({
+                        'message': 'You are logged out. Please log in again.'
+                    }), 401)
+            try:    
                 identity = User.decode_auth_token(auth_token)
                 
                 if identity == 'Invalid token. Please log in again.':
@@ -70,9 +71,10 @@ def token_required(j):
                     }), 401)
             except Exception as e:
                 return e
-        return make_response(jsonify({
-            'status': 'failed',
-            'message': 'You are not authorized'
-        }), 401)
+        else:
+            return make_response(jsonify({
+                'status': 'failed',
+                'message': 'You are not authorized'
+            }), 401)
         return j(*args, **kwargs)
     return decorated_token
