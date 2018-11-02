@@ -2,10 +2,10 @@ from flask import Flask, request, jsonify, Blueprint, json, make_response
 from flask_restplus import Resource, reqparse, Api, Namespace, fields
 from ..models.product_model import Product
 from ..models.user_model import User
-from ..utils.auth import admin_required, token_required
+from app.api.V2.utils.auth import admin_required, token_required
 
 api = Namespace('Product_endpoints', description='A collection of endpoints for the product model; includes get and post endpoints', 
-path='api/v1/products')
+path='api/v2/products')
 
 parser = reqparse.RequestParser()
 parser.add_argument('product_name', help = 'This field cannot be blank', required = True)
@@ -14,16 +14,15 @@ parser.add_argument('quantity', help = 'This field cannot be blank', required = 
 parser.add_argument('reorder_level', help = 'This field cannot be blank', required = True)
 parser.add_argument('price', help = 'This field cannot be blank', required = True)
 
-
-@api.route('')
-class ProductEndpoint(Resource):
-    product_fields = api.model('Product', {
+product_fields = api.model('Product', {
     'product_name' : fields.String,
     'category': fields.String,
     'quantity': fields.Integer,
     'reorder_level': fields.Integer,
     'price': fields.Integer
 })
+@api.route('')
+class ProductEndpoint(Resource):
     @api.expect(product_fields)
     @api.doc(security='apikey')
     @admin_required
@@ -33,10 +32,15 @@ class ProductEndpoint(Resource):
         product_name = args['product_name']
         category = args['category']
         quantity = args['quantity']
-        reoder_level = args['reorder_level']
+        reorder_level = args['reorder_level']
         price = args['price']
 
-        new_product = Product(product_name, category, quantity, reoder_level, price)
+        find_product = Product.get_product_by_name(self, product_name, quantity)
+        if find_product:
+            return make_response(jsonify({
+                'message': 'product exists, you can edit it.'
+            }))
+        new_product = Product(product_name, category, quantity, reorder_level, price)
         created_product = new_product.create_product()
         return make_response(jsonify({
             'status': 'ok',
@@ -81,7 +85,44 @@ class GetSingleProduct(Resource):
         return make_response(jsonify({
             'status': 'failed',
             'message': 'not found'
-        }), 404)  
+        }), 404)
 
 
+    @api.expect(product_fields)
+    @api.doc(security='apikey')
+    @admin_required
+    def put(self, product_id):
+        """ Create a new product """
+        args = parser.parse_args()
+        product_name = args['product_name']
+        category = args['category']
+        quantity = args['quantity']
+        reorder_level = args['reorder_level']
+        price = args['price']
+
+        find_product = Product.get_product_by_name(self, product_name, quantity)
+        if find_product:
+            return make_response(jsonify({
+                'message': 'product name exists, you can edit it.'
+            }))
+        u_product = Product(product_name, category, quantity, reorder_level, price)
+        updated_product = u_product.update_product(product_id)
+        return make_response(jsonify({
+            'status': 'ok',
+            'message': 'product edited successfully',
+            'product': updated_product
+        }), 201)  
+
+
+    
+    @api.doc(security='apikey')
+    @admin_required
+    def delete(self, product_id):
+        product_to_delete = Product.get_single_product(product_id)
+        if product_to_delete:
+            Product.delete_product(self, product_id)
+            return make_response(jsonify({
+                'status': 'ok',
+                'message': 'product deleted successfully'
+            }))
         

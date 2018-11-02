@@ -3,6 +3,7 @@ import json
 # Local application imports
 from .base_test import BaseTest
 from app.api.V1.models.user_model import User
+from app.api.V2.utils.validator import Password
 
 reg_url = 'api/v1/auth/signup'
 login_url = 'api/v1/auth/login'

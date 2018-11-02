@@ -3,11 +3,12 @@ from flask import Flask, request, jsonify, Blueprint, json, make_response
 from flask_restplus import Resource, reqparse, Api, Namespace, fields
 from ..models.sales_model import Sales
 from ..models.user_model import User
-from ..utils.auth import token_required, admin_required
+from app.api.V2.utils.auth import token_required, admin_required
 
 
 api = Namespace('Sales_endpoints', description='A collection of endpoints for the sales model; includes get and post endpoints', 
-path='api/v1/sales')
+path='api/v2/sales')
+ns4 = Namespace('Seller sales endpoint', description='Get sales record by seller name')
 
 
 parser = reqparse.RequestParser()
@@ -35,13 +36,24 @@ class SalesEndpoint(Resource):
         total = args['total']
         seller = args['seller']
 
-        new_sale = Sales(product_name, quantity, total, seller)
-        created_sale = new_sale.create_sale()
-        return make_response(jsonify({
-            'status': 'ok',
-            'message': 'Sale created successfully',
-            'sales': created_sale
-        }), 201)
+        product = Sales.get_product_by_name(self, product_name)
+        if product:
+            qty = product['quantity']
+            rem_quantity = int(qty)
+            if rem_quantity == 0:
+                return make_response(jsonify({'message': 'Product is not available'}), 404)
+            if rem_quantity >= int(quantity): 
+                rem_quantity = rem_quantity - int(quantity)
+                new_sale = Sales(product_name, quantity, total, seller)
+                created_sale = new_sale.create_sale()
+                return make_response(jsonify({
+                    'status': 'ok',
+                    'message': 'Sale created successfully',
+                    'sales': created_sale
+                }), 201)
+            
+            return make_response(jsonify({'message': 'The product you are trying to sell is higher than the stock level.\
+    The remaining quantity is {}'.format(rem_quantity)}), 400)
 
     @api.doc(security='apikey')
     @admin_required
@@ -73,3 +85,21 @@ class GetSingleSale(Resource):
             'message': 'not found'
         }), 404)
 
+@api.route('/<seller>')
+class GetSaleBySeller(Resource):
+    """Get single sale by seller""" 
+    @api.doc(security='apikey')
+    @token_required
+    def get(self, seller):
+        """Get a specific sale when provided with a seller name"""
+        sales_records = Sales.get_sales_by_seller(self, seller) 
+        if sales_records:
+            return make_response(jsonify({
+                'status': 'ok',
+                'message': 'success',
+                'sale': sales_records
+            }), 200)
+        return make_response(jsonify({
+            'status': 'failed',
+            'message': 'not found'
+        }), 404)

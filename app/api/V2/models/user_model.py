@@ -1,13 +1,14 @@
 from passlib.hash import pbkdf2_sha256 as sha256
 from app.instance.config import secret_key
+from psycopg2.extras import RealDictCursor
+import psycopg2
+from app.db_setup import db_url
 from datetime import datetime, timedelta
 import jwt
 
 class User():
-    user_id = 1
-    users = []
 
-    def __init__(self, email, password, username, role, phone):
+    def __init__(self, username, email, phone, role, password):
         self.username = username
         self.email = email
         self.password =password
@@ -15,28 +16,54 @@ class User():
         self.phone = phone
 
     def create_user(self):
-        user = dict(
+        user = dict(   
             username = self.username,
             email = self.email,
-            password = self.password, 
+            phone = self.phone,
             role = self.role,
-            phone = self.phone
+            password = self.password
         )
-        User.users.append(user)
+        
+        query = """
+                INSERT INTO users(username, email, phone, role, password)
+                VALUES(%s,%s,%s,%s,%s);
+                """
+        conn = psycopg2.connect(db_url)
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(query, (self.username, self.email, self.phone, self.role, self.password))
+        conn.commit()
         return user
         
-    
-    def get_single_user(self, email):
+    @staticmethod
+    def get_single_user(email):
         """Retrieve user details by email"""
-        single_user = [user for user in User.users if user['email'] == email]
-        if single_user:
-            return single_user[0]
-        return 'not found'
+        query = """
+                SELECT * FROM users 
+                WHERE email=%s; 
+                """
+        conn = psycopg2.connect(db_url)
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(query,(email,))
+        user = cur.fetchone()
+        if user:
+            return user
+        return {"message": "There are no records found"}
+        
 
-
-    def get_all_users(self):
-        return User.users
-
+    @staticmethod
+    def get_all_users():
+        query = """
+                SELECT * FROM users;
+                """
+        conn = psycopg2.connect(db_url)
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(query)
+        user = cur.fetchall()
+        if user:
+            return user
+        else:
+            return {"message": "There are no records"}
+        
    
 
     @staticmethod
@@ -74,7 +101,6 @@ class User():
         
         try:
             payload = jwt.decode(auth_token, secret_key, options={'verify_iat': False})
-            # print (payload)
             return payload
         except jwt.ExpiredSignatureError:
             return {'message': 'Signature expired. Please log in again.'}

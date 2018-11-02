@@ -8,30 +8,74 @@
 Store Manager is a web application that helps store owners manage sales and product inventory records. This application is meant for use in a single store. This is an api to help interact with the application in other platforms.
 
 # Required Features
-* Store attendant can search and add products to buyer’s cart.
-* Store attendant can see his/her sale records but can’t modify them.
-* App should show available products, quantity and price.
-* Store owner can see sales and can filter by attendants.
-* Store owner can add, modify and delete products.
+*  Store attendant can search and add products to buyer’s cart.
+*  Store attendant can see his/her sale records but can’t modify them.
+*  App should show available products, quantity and price.
+*  Store owner can see sales and can filter by attendants.
+*  Store owner can add, modify and delete products.
 
-# Optional Features
-* Store owner can give admin rights to a store attendant.
-* Products should have categories.
-* Store attendants should be able to add products to specific categories.
+#  Optional Features
+*  Store owner can give admin rights to a store attendant.
+*  Products should have categories.
+*  Store attendants should be able to add products to specific categories.
 
 # Technologies
-* HTML
-* CSS
-* Pivotal Tracker
-* Python
+*  HTML
+*  CSS
+*  Pivotal Tracker
+*  Python - Flask
+*  Database - Postgres
 
-# Getting Started
-* Create a virtual env in your project folder
-* git clone https://github.com/eduhmik/Store-Manager.git
-* Activate virtual environment
-* Install dependencies by running 'pip install -r requirements.txt
 
-# Screenshots
+#  Documentation
+*  Postman https://documenter.getpostman.com/view/3903946/RzZ4pMW8
+
+#  Demo link
+*  Heroku App https://eduhmik-store-manager.herokuapp.com/api/v2/
+
+#  Getting Started
+*  git clone https://github.com/eduhmik/Store-Manager.git
+
+*  Create a virtual env in your project folder
+   <b>To run the app localy</b><br>
+    *  Activate virtual environment
+
+    * Activate the app using command - 'source venv/Scripts/activate' on windows
+
+    * Activate the app using command - 'source venv/bin/activate' on linux and mac
+
+    *  Install dependencies by running 'pip install -r requirements.txt
+
+    * Run the application using - 'python run.py' or on Visual studio code left click on run.py         then click on run on terminal
+
+    * The app is stil in development so it will run with DEBUG=True in default
+
+
+#  Running the tests
+
+To run the tests
+    
+    * Use command   nosetests --with-coverage --cover-package=test && coverage report
+
+#  Completed Endpoints
+
+Endpoint                   | Functionality                |
+-------------------------- | -----------------------------
+GET /products | Fetch all products           
+GET /products/<productId> | Fetch a single product record
+GET /sales | Fetch all sale records       
+GET /sales/<saleId> | Fetch a single sale record
+GET /sales/<seller> | Get sales by seller name
+GET/users | Gets all users
+POST /products | Create a product             
+POST /sales | Create a sale order          
+POST /auth/register | Register a user
+POST /auth/login | Login a user    
+PUT /products/<productId> | Modify a product
+DELETE /products/<productId> | Delete a product
+
+
+#  Screenshots
 
 1. Sample Products Request
 ![GitHub Logo](/images/Products.PNG)
@@ -54,20 +98,8 @@ Format: ![Alt Text](url)
 Format: ![Alt Text](url)
 
 
-# Authors
-* **Edwin Kimaita** - *Initial work* - [Eduhmik](https://github.com/Eduhmik)
+#  Authors
+*  **Edwin Kimaita** - *Initial work* - [Eduhmik](https://github.com/Eduhmik)
 
-
-
-
-Endpoint                   | Functionality                |
--------------------------- | -----------------------------
-GET /products | Fetch all products           
-GET /products/<productId> | Fetch a single product record
-GET /sales | Fetch all sale records       
-GET /sales/<saleId> | Fetch a single sale record   
-POST /products | Create a product             
-POST /sales | Create a sale order          
-POST /auth/register | Register a user
-POST /auth/login | Login a user                 
+             
 
