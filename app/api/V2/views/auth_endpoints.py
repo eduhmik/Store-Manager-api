@@ -23,6 +23,13 @@ login_fields = api.model('Login', {
     'email': fields.String,
     'password': fields.String
 })
+registration_fields = api.model('Registration', {
+    'username' : fields.String,
+    'email': fields.String,
+    'phone' : fields.String,
+    'role': fields.String,
+    'password': fields.String
+})
 
 """user login"""
 @ns2.route('')
@@ -63,15 +70,6 @@ class UserLogin(Resource):
                 'message' : str(e),
                 'status' : 'failed'
             }), 500)
-
-registration_fields = api.model('Registration', {
-    'username' : fields.String,
-    'email': fields.String,
-    'phone' : fields.String,
-    'role': fields.String,
-    'password': fields.String
-})
-
 
 """user regitration"""
 @api.route('')
