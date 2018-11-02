@@ -42,9 +42,7 @@ class Sales():
 
     """method to fetch for all sales records"""
     def get_all_sales (self):
-        query = """
-                SELECT * FROM sales 
-                """
+        query = """SELECT * FROM sales"""
         conn = psycopg2.connect(db_url)
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute(query)
@@ -54,18 +52,14 @@ class Sales():
 
     """method to fetch for a single sale record by id"""
     def get_single_sale (self, sales_id):
-        query = """
-                SELECT * FROM sales 
-                WHERE sales_id=%s; 
-                """
+        query = """SELECT * FROM sales WHERE sales_id=%s;"""
         conn = psycopg2.connect(db_url)
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute(query,(sales_id,))
-        product = cur.fetchone()
-        print(product)
-        if product:
-            return product
-        return {"message": "There is no product found"}
+        sales = cur.fetchone()
+        if sales:
+            return sales
+        return {"message": "There is no sale record found"}
 
     """method to fetch sales by sellers"""
     def get_sales_by_seller(self, seller):

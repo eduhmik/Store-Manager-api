@@ -14,7 +14,7 @@ class DatabaseSetup:
     """Initialize a db connection"""
     def __init__(self, config_name):
         self.db_url = db_url
-        self.db_connection = psycopg2.connect(self.db_url)
+        self.db_connection = psycopg2.connect(dsn=self.db_url)
 
     def create_tables(self):
         db_connection = self.db_connection

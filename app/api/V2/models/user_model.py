@@ -101,7 +101,6 @@ class User():
         
         try:
             payload = jwt.decode(auth_token, secret_key, options={'verify_iat': False})
-            # print (payload)
             return payload
         except jwt.ExpiredSignatureError:
             return {'message': 'Signature expired. Please log in again.'}

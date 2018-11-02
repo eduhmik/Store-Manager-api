@@ -19,7 +19,6 @@ parser.add_argument('phone', help = 'This field cannot be blank')
 parser.add_argument('role', help = 'This field cannot be blank')
 parser.add_argument('password', help = 'This field cannot be blank', required = True)
 
-
 login_fields = api.model('Login', {
     'email': fields.String,
     'password': fields.String
@@ -96,15 +95,23 @@ class UserRegistration(Resource):
             return make_response(jsonify({
                 'message': 'The role can only be an admin or attendant.'
             }))
-
+        
         if len(password) < 6:
             return make_response(jsonify({"message": "The password is too short,minimum length is 6"}), 400)
-
+#         if Password().is_valid(password) == 'invalid':
+#             return make_response(jsonify({
+#             'message': ['The password you entered is invalid password should contain',
+#                     {'a lowercase character':'an uppercase character', 
+#                         'a digit': 'a special character e.g $@*', 
+#                         'length':'length not less than 6 or above 13'
+#                     }
+#             ]
+# }))
         existing_user = User.get_single_user(email)
         if existing_user == {"message": "There are no records found"}:
-            
+
             try:
-                
+
                 new_user = User(username, email, phone, role, User.generate_hash(password))
                 created_user = new_user.create_user()
                 return make_response(jsonify({
@@ -112,19 +119,19 @@ class UserRegistration(Resource):
                     'message': 'User created successfully',
                     'users': created_user
                 }), 201)
-                    
-            
+                        
+                
             except Exception as e:
                 return make_response(jsonify({
-                'message' : str(e),
-                'status' : 'failed'
-            }), 500)
+                    'message' : str(e),
+                    'status' : 'failed'
+                }), 500)
         
         return make_response(jsonify({
-                        'status': 'fail',
-                        'message' : 'Email already exists, please log in'
-                    }))
-
+                            'status': 'fail',
+                            'message' : 'Email already exists, please log in'
+                        }))
+            
 """fetch all users""" 
 @ns.route('')  
 class AllUsers(Resource):

@@ -3,7 +3,7 @@ from flask import Flask, request, jsonify, Blueprint, json, make_response
 from flask_restplus import Resource, reqparse, Api, Namespace, fields
 from ..models.sales_model import Sales
 from ..models.user_model import User
-from ..utils.auth import token_required, admin_required
+from app.api.V2.utils.auth import token_required, admin_required
 
 
 api = Namespace('Sales_endpoints', description='A collection of endpoints for the sales model; includes get and post endpoints', 
@@ -53,7 +53,7 @@ class SalesEndpoint(Resource):
                 }), 201)
             
             return make_response(jsonify({'message': 'The product you are trying to sell is higher than the stock level.\
-    The remaining quantity is {}'.format(rem_quantity)}), 401)
+    The remaining quantity is {}'.format(rem_quantity)}), 400)
 
     @api.doc(security='apikey')
     @admin_required

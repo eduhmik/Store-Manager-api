@@ -1,14 +1,43 @@
 import random
 import re
 
-class Password():
-    """method to validate a password"""
-    def check_is_valid(self, pwd):
-        special_chars = ['$', '#', '@', '!', '%', '^', '&', '*']
+class Password(object):
+    @staticmethod
+    def check_has_digit(self,pwd):
         for char in pwd:
-            if char.isdigit() and char.islower() and char.isupper() and [char for char in pwd if char in special_chars] and len(pwd) in range(6, 13):
+            if char.isdigit():
                 return True
-        return True
+    @staticmethod
+    def check_has_lower(self,pwd):
+        for char in pwd:
+            if char.islower():
+                return True
+    @staticmethod
+    def check_has_upper(self,pwd):
+        for char in pwd:
+            if char.isupper():
+                return True
+    @staticmethod
+    def check_has_special_chars(self,pwd):
+        special_chars = ['$', '#', '@']
+        return [char for char in pwd if char in special_chars]
+    @staticmethod
+    def check_password_length(self,pwd):
+        if len(pwd) in range(6, 13):
+            return True
+    @staticmethod
+    def is_valid(self, pwd):
+        bool = self.check_has_digit(pwd) and self.check_has_lower(pwd) and self.check_has_special_chars(pwd) and self.check_password_length(pwd) and self.check_has_upper(pwd)
+        if bool:
+            return 'validated'
+        return 'invalid'
+    @staticmethod
+    def get_valid_passwords(self, pwds):
+        validated_password = []
+        for pwd in pwds:
+            if self.is_valid(pwd):
+                validated_password.append(pwd)
+            return validated_password
         
 
 class Email():

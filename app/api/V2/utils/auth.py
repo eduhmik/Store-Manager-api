@@ -30,19 +30,17 @@ def admin_required(f):
                         'message': 'Invalid token. Please log in again.'
                     }), 401)
 
-            except Exception:
-                return make_response(jsonify({
-                    'status': 'failed',
-                    'message': 'You are not authorized'
-                }), 401)
-                
-            if auth_token:
-                
                 if identity['role'] == 'attendant':
                     return make_response(jsonify({
                         'status': 'failed',
                         'message': 'You are not an admin'
                     }), 401)
+
+            except Exception:
+                return make_response(jsonify({
+                    'status': 'failed',
+                    'message': 'You are not authorized'
+                }), 401)
         return f(*args, **kwargs)
     return decorated
 
@@ -70,11 +68,11 @@ def token_required(j):
                         'status': 'failed',
                         'message': 'Invalid token. Please log in again.'
                     }), 401)
-
-            except Exception:
-                return make_response(jsonify({
-                    'status': 'failed',
-                    'message': 'You are not authorized'
-                }), 401)
+            except Exception as e:
+                return e
+        return make_response(jsonify({
+            'status': 'failed',
+            'message': 'You are not authorized'
+        }), 401)
         return j(*args, **kwargs)
     return decorated_token
