@@ -23,13 +23,39 @@ Store Manager is a web application that helps store owners manage sales and prod
 *  HTML
 *  CSS
 *  Pivotal Tracker
-*  Python
+*  Python - Flask
+*  Database - Postgres
+
+
+#  Documentation
+*  Postman https://documenter.getpostman.com/view/3903946/RzZ4pMW8
+
+#  Demo link
+*  Heroku App https://eduhmik-store-manager.herokuapp.com/api/v2/
 
 #  Getting Started
-*  Create a virtual env in your project folder
 *  git clone https://github.com/eduhmik/Store-Manager.git
-*  Activate virtual environment
-*  Install dependencies by running 'pip install -r requirements.txt
+
+*  Create a virtual env in your project folder
+   <b>To run the app localy</b><br>
+    *  Activate virtual environment
+
+    * Activate the app using command - 'source venv/Scripts/activate' on windows
+
+    * Activate the app using command - 'source venv/bin/activate' on linux and mac
+
+    *  Install dependencies by running 'pip install -r requirements.txt
+
+    * Run the application using - 'python run.py' or on Visual studio code left click on run.py         then click on run on terminal
+
+    * The app is stil in development so it will run with DEBUG=True in default
+
+
+#  Running the tests
+
+To run the tests
+    
+    * Use command   nosetests --with-coverage --cover-package=test && coverage report
 
 #  Completed Endpoints
 
