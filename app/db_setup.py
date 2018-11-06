@@ -32,7 +32,7 @@ class DatabaseSetup:
         
         db_connection = self.db_connection
         cursor = self.db_connection.cursor()
-        queries=[table1,table2,table3]
+        queries=[table1,table2,table3, table4]
         for query in queries:
             cursor.execute(query)
         db_connection.commit()
