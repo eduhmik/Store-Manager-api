@@ -19,15 +19,16 @@ parser.add_argument('phone', help = 'This field cannot be blank')
 parser.add_argument('role', help = 'This field cannot be blank')
 parser.add_argument('password', help = 'This field cannot be blank', required = True)
 
-login_fields = api.model('Login', {
-    'email': fields.String,
-    'password': fields.String
-})
 registration_fields = api.model('Registration', {
     'username' : fields.String,
     'email': fields.String,
     'phone' : fields.String,
     'role': fields.String,
+    'password': fields.String
+})
+
+login_fields = api.model('Login', {
+    'email': fields.String,
     'password': fields.String
 })
 
