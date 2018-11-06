@@ -14,7 +14,7 @@ class DatabaseSetup:
     """Initialize a db connection"""
     def __init__(self, config_name):
         self.db_url = db_url
-        self.db_connection = psycopg2.connect(dsn=self.db_url)
+        self.db_connection = psycopg2.connect(self.db_url)
 
     def create_tables(self):
         db_connection = self.db_connection
@@ -28,6 +28,7 @@ class DatabaseSetup:
         table1="""DROP TABLE IF EXISTS users CASCADE"""
         table2="""DROP TABLE IF EXISTS products CASCADE"""
         table3="""DROP TABLE IF EXISTS sales CASCADE"""
+        table4="""DROP TABLE IF EXISTS revoke_tokens CASCADE"""
         
         db_connection = self.db_connection
         cursor = self.db_connection.cursor()
