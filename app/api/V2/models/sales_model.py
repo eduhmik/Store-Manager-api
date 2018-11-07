@@ -5,7 +5,7 @@ from app.db_setup import db_url
 class Sales():
     """initializing the constructor"""
     def __init__(self, product_name, quantity, total, seller):
-        self.product_name = product_name
+        self.product_name = str(product_name).casefold
         self.quantity = quantity
         self.total = total
         self.seller = seller
@@ -89,19 +89,3 @@ class Sales():
         product = cur.fetchone()
         if product:
             return product
-           
-    # @staticmethod
-    # def update_qty_after_sale(quantity, product_name):
-    #     update_query = """
-    #                     UPDATE products 
-    #                     SET quantity = %s
-    #                     WHERE product_name = %s;
-    #                 """
-    #     conn = psycopg2.connect(db_url)
-    #     cur = conn.cursor(cursor_factory=RealDictCursor)
-    #     cur.execute(update_query, (quantity, product_name))
-        # new_product_stock = cur.fetchone()
-        # print(new_product_stock)
-        # if new_product_stock:
-        #     return new_product_stock
-        # return {'message': 'something happened'}

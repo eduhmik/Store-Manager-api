@@ -4,7 +4,7 @@ from flask_restplus import Resource, reqparse, Api, Namespace, fields
 from ..models.sales_model import Sales
 from ..models.user_model import User
 from app.api.V2.utils.auth import token_required, admin_required
-
+from app.api.V2.utils.validator import Verify
 
 api = Namespace('Sales_endpoints', description='A collection of endpoints for the sales model; includes get and post endpoints', 
 path='api/v2/sales')
@@ -26,8 +26,7 @@ sales_fields = api.model('Sale', {
 
 @api.route('')
 class SalesEndpoint(Resource):
-    
-    @api.expect(sales_fields)
+    @api.expect(sales_fields, validate=True)
     @api.doc(security='apikey')
     @token_required
     def post(self):
@@ -38,7 +37,21 @@ class SalesEndpoint(Resource):
         total = args['total']
         seller = args['seller']
 
+        payload= [product_name, quantity, total, seller]
+
+        if payload is False:
+            return {'message':'Payload is invalid'},406
+        elif Verify.is_empty(self, payload) is True:
+            return {'message':'Required field is empty'},406
+        elif Verify.is_whitespace(self, payload) is True:
+            return {'message':'Required field contains only white spaces'},406
+        elif int(quantity) < 1:
+            return {'message':'Product quantity cannot be less than 1'},406
+        elif int(total) < 1:
+            return {'message':'Amount total cannot be less than 1'},406
+       
         product = Sales.get_product_by_name(self, product_name)
+    
         if product:
             qty = product['quantity']
             rem_quantity = int(qty)
@@ -46,7 +59,7 @@ class SalesEndpoint(Resource):
                 return make_response(jsonify({'message': 'Product is not available'}), 404)
             if rem_quantity >= int(quantity): 
                 rem_quantity = rem_quantity - int(quantity)
-                new_sale = Sales(product_name, quantity, total, seller)
+                new_sale = Sales(product_name.lower(), quantity, total, seller)
                 created_sale = new_sale.create_sale()
                 return make_response(jsonify({
                     'status': 'ok',
@@ -56,6 +69,7 @@ class SalesEndpoint(Resource):
             
             return make_response(jsonify({'message': 'The product you are trying to sell is higher than the stock level.\
     The remaining quantity is {}'.format(rem_quantity)}), 400)
+        return {'message': 'Product you are trying to sell does not exist'}
 
     @api.doc(security='apikey')
     @admin_required

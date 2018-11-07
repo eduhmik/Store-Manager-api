@@ -19,8 +19,7 @@ class BaseTest(TestCase):
     """
     Class to hold all similar test config
     """
-    
-    
+
     def setUp(self):
         self.app = create_app('testing')
         self.client = self.app.test_client

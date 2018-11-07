@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify, Blueprint, json, make_response
 from flask_restplus import Resource, reqparse, Api, Namespace, fields
 from ..models.user_model import User
 from ..models.revoke_token_model import RevokedTokenModel
-from app.api.V2.utils.validator import Password, Email
+from app.api.V2.utils.validator import Password, Email, Verify
 from app.api.V2.utils.auth import admin_required
 import re
 
@@ -19,14 +19,6 @@ parser.add_argument('phone', help = 'This field cannot be blank')
 parser.add_argument('role', help = 'This field cannot be blank')
 parser.add_argument('password', help = 'This field cannot be blank', required = True)
 
-registration_fields = api.model('Registration', {
-    'username' : fields.String,
-    'email': fields.String,
-    'phone' : fields.String,
-    'role': fields.String,
-    'password': fields.String
-})
-
 login_fields = api.model('Login', {
     'email': fields.String,
     'password': fields.String
@@ -35,7 +27,7 @@ login_fields = api.model('Login', {
 """user login"""
 @ns2.route('')
 class UserLogin(Resource):
-    @ns2.expect(login_fields)
+    @ns2.expect(login_fields, validate=True)
     def post(self):
         args = parser.parse_args()
         email = args['email']
@@ -72,10 +64,18 @@ class UserLogin(Resource):
                 'status' : 'failed'
             }), 500)
 
-"""user regitration"""
+
+registration_fields = api.model('Registration', {
+    'username' : fields.String,
+    'email': fields.String,
+    'phone' : fields.String,
+    'role': fields.String,
+    'password': fields.String
+})
+"""user registration"""
 @api.route('')
 class UserRegistration(Resource):
-    @api.expect(registration_fields)
+    @api.expect(registration_fields, validate=True)
     @admin_required
     def post(self):
         args = parser.parse_args()
@@ -97,39 +97,53 @@ class UserRegistration(Resource):
         
         if len(password) < 6:
             return make_response(jsonify({"message": "The password is too short,minimum length is 6"}), 400)
-#         if Password().is_valid(password) == 'invalid':
-#             return make_response(jsonify({
-#             'message': ['The password you entered is invalid password should contain',
-#                     {'a lowercase character':'an uppercase character', 
-#                         'a digit': 'a special character e.g $@*', 
-#                         'length':'length not less than 6 or above 13'
-#                     }
-#             ]
-# }))
-        existing_user = User.get_single_user(email)
-        if existing_user == {"message": "There are no records found"}:
+        if Password(password).is_valid(password) == 'invalid':
+            return make_response(jsonify({
+            'message': ['The password you entered is invalid password should contain',
+                    {'a lowercase character':'an uppercase character', 
+                        'a digit': 'a special character e.g $@*', 
+                        'length':'length not less than 6 or above 13'
+                    }
+            ]
+}))
 
-            try:
+        payload= [username, email, phone, role, password]
 
-                new_user = User(username, email, phone, role, User.generate_hash(password))
-                created_user = new_user.create_user()
-                return make_response(jsonify({
-                    'status': 'ok',
-                    'message': 'User created successfully',
-                    'users': created_user
-                }), 201)
-                        
-                
-            except Exception as e:
-                return make_response(jsonify({
-                    'message' : str(e),
-                    'status' : 'failed'
-                }), 500)
+        existing_email = User.get_single_user(email)
+        existing_username = User.get_user_by_username(username)
+
+        if payload is False:
+            return {'message':'Payload is invalid'},406
+        elif Verify.is_empty(self, payload) is True:
+            return {'message':'Required field is empty'},406
+        elif Verify.is_whitespace(self, payload) is True:
+            return {'message':'Required field contains only white spaces'},406
+
+        if existing_username == {"message": "There are no records found"}:
         
-        return make_response(jsonify({
-                            'status': 'fail',
-                            'message' : 'Email already exists, please log in'
-                        }))
+            if existing_email == {"message": "There are no records found"}:
+
+                try:
+
+                    new_user = User(username, email, phone, role, User.generate_hash(password))
+                    created_user = new_user.create_user()
+                    return make_response(jsonify({
+                        'status': 'ok',
+                        'message': 'User created successfully',
+                        'users': created_user
+                    }), 201)
+                            
+                    
+                except Exception as e:
+                    return make_response(jsonify({
+                        'message' : str(e),
+                        'status' : 'failed'
+                    }), 500)
+            return make_response(jsonify({
+                                'status': 'fail',
+                                'message' : 'Email already exists, please log in'
+                            }))
+        return {'message':'Username already exists'},406
             
 """fetch all users""" 
 @ns.route('')  

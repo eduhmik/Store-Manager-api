@@ -1,43 +1,33 @@
 import random
 import re
 
-class Password(object):
-    @staticmethod
+class Password():
+    def __init__(self, pwd):
+        self.pwd = pwd
+    
     def check_has_digit(self,pwd):
-        for char in pwd:
-            if char.isdigit():
-                return True
-    @staticmethod
+        return any(char.isdigit() for char in pwd)
+    
     def check_has_lower(self,pwd):
-        for char in pwd:
-            if char.islower():
-                return True
-    @staticmethod
+        return any(char.islower() for char in pwd)
+    
     def check_has_upper(self,pwd):
-        for char in pwd:
-            if char.isupper():
-                return True
-    @staticmethod
+        return any(char.isupper() for char in pwd)
+    
     def check_has_special_chars(self,pwd):
-        special_chars = ['$', '#', '@']
+        special_chars = ['$', '#', '@', '*', '&', '!', '%']
         return [char for char in pwd if char in special_chars]
-    @staticmethod
+    
     def check_password_length(self,pwd):
         if len(pwd) in range(6, 13):
             return True
-    @staticmethod
+    
     def is_valid(self, pwd):
         bool = self.check_has_digit(pwd) and self.check_has_lower(pwd) and self.check_has_special_chars(pwd) and self.check_password_length(pwd) and self.check_has_upper(pwd)
         if bool:
             return 'validated'
         return 'invalid'
-    @staticmethod
-    def get_valid_passwords(self, pwds):
-        validated_password = []
-        for pwd in pwds:
-            if self.is_valid(pwd):
-                validated_password.append(pwd)
-            return validated_password
+    
         
 
 class Email():
@@ -48,3 +38,52 @@ class Email():
         if match is None:
             return {"message": "Enter a valid email address"}
         return True
+
+
+class Verify():
+    def __init__(self, payload):
+        self.payload = payload
+
+    def is_empty(self, items):
+        for item in items:
+            if bool(item) is False:
+                return True
+        return False
+
+
+    def is_whitespace(self, items):
+        for item in items:
+            if item.isspace() is True:
+                return True
+        return False
+
+
+    def is_payload(self, items, length):
+        for item in items:
+            if item is None or not item:
+                return False
+
+
+    def is_product_payload(self, items):
+        res = self.payload(items, 5)
+        if res:
+            return 'valid'
+        return 'invalid'
+
+
+    def is_sales_payload(self, items):
+        res = self.payload(items, 4, ['product_name', 'quantity', 'total', 'seller'])
+        return res
+
+
+    def is_register_payload(self, items):
+        res = self.payload(items, 5, ['username', 'email', 'phone', 'role', 'password'])
+        return res
+
+
+    def is_login_payload(self, items):
+        res = self.payload(items, 2, ['email', 'password'])
+        return res
+
+
+        
