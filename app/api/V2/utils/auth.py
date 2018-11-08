@@ -31,7 +31,7 @@ def admin_required(f):
                         'message': 'Invalid token. Please log in again.'
                     }), 401)
 
-                if identity['role'] == 'attendant':
+                if identity['role'] != 'admin':
                     return make_response(jsonify({
                         'status': 'failed',
                         'message': 'You are not an admin'

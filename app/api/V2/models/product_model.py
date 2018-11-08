@@ -82,8 +82,8 @@ class Product(Verify):
         if product:
             return product
         return {"message": "There is no product found"}
-
-    def get_product_by_name(self, product_name, quantity):
+    @staticmethod
+    def get_product_by_name(product_name):
         """Method to get a single product by name"""
         query = """
                 SELECT * FROM products 
