@@ -59,7 +59,7 @@ class SalesEndpoint(Resource):
                 return make_response(jsonify({'message': 'Product is not available'}), 404)
             if rem_quantity >= int(quantity): 
                 rem_quantity = rem_quantity - int(quantity)
-                new_sale = Sales(product_name.lower(), quantity, total, seller)
+                new_sale = Sales(product_name, quantity, total, seller)
                 created_sale = new_sale.create_sale()
                 return make_response(jsonify({
                     'status': 'ok',

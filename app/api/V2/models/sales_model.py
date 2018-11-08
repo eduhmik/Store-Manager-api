@@ -5,7 +5,7 @@ from app.db_setup import db_url
 class Sales():
     """initializing the constructor"""
     def __init__(self, product_name, quantity, total, seller):
-        self.product_name = str(product_name).casefold
+        self.product_name = product_name
         self.quantity = quantity
         self.total = total
         self.seller = seller
@@ -71,7 +71,6 @@ class Sales():
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute(query,(seller,))
         sales = cur.fetchall()
-        print(sales)
         if sales:
             return sales
         return {"message": "There is no sales record for this seller"}

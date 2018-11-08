@@ -23,6 +23,7 @@ def admin_required(f):
                     }), 401)
             try:        
                 identity = User.decode_auth_token(auth_token)
+                print(identity)
                 
                 if identity == 'Invalid token. Please log in again.':
                     return make_response(jsonify({

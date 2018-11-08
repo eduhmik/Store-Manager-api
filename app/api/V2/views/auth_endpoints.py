@@ -32,6 +32,18 @@ class UserLogin(Resource):
         args = parser.parse_args()
         email = args['email']
         password = args['password']
+
+        match = re.match(
+            r'^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', email)
+        if not match:
+            return {"message": "Enter a valid email address"}
+        payload = [email, password]
+        if payload is False:
+            return {'message':'Payload is invalid'},406
+        elif Verify.is_empty(self, payload) is True:
+            return {'message':'Required field is empty'},406
+        elif Verify.is_whitespace(self, payload) is True:
+            return {'message':'Required field contains only white spaces'},406
                 
         try:
             current_user = User.get_single_user(email)
@@ -168,22 +180,30 @@ class UserLogoutAccess(Resource):
         if authentication_header:    
             auth_token = authentication_header.split(" ")[1]
 
+            identity = User.decode_auth_token(auth_token)
+
+            if identity == 'Invalid token. Please log in again.':
+                    return make_response(jsonify({
+                        'status': 'failed',
+                        'message': 'Invalid token. Please log in again.'
+                    }), 401)
+
             revoked = RevokedTokenModel.is_token_blacklisted(auth_token)
             if revoked:
                 return make_response(jsonify({
                         'message': 'You are logged out. Please log in again.'
                     }), 401)
-            # try:
-            if auth_token:
-                revoked_token = RevokedTokenModel(auth_token = auth_token)
-                revoked_token.add()
+            try:
+                if auth_token:
+                    revoked_token = RevokedTokenModel(auth_token = auth_token)
+                    revoked_token.add()
+                    return make_response(jsonify({
+                        'message': 'Authentication token has been revoked'
+                }))
+            except:
                 return make_response(jsonify({
-                    'message': 'Authentication token has been revoked'
-            }))
-            # except:
-            #     return make_response(jsonify({
-            #     'message': 'Something unexpected happened'
-            # }), 500)
+                'message': 'Something unexpected happened'
+            }), 500)
         else:
             return make_response(jsonify({
                 'status': 'failed',
