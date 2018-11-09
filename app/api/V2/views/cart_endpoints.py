@@ -117,6 +117,7 @@ class GetSingleCart(Resource):
                 price = find_product['price']
                 total = int(price)*int(quantity)
                 product_to_update = Cart(product_name, quantity, total, seller)
+                Cart.update_product_quantity(self, product_name, quantity)
                 updated_cart_item = product_to_update.update_cart_item(carts_id, product_name)
                 return make_response(jsonify({
                     'status': 'ok',

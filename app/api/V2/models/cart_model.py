@@ -105,6 +105,8 @@ class Cart():
             cur = conn.cursor(cursor_factory=RealDictCursor)
             cur.execute(query,(new_qty, new_price, carts_id))
             conn.commit()
+            item = self.get_single_cart_item(carts_id)
+            self.update_product_quantity(product_name, item['quantity'])
             update_query = """UPDATE products SET quantity=%sWHERE product_name=%s"""
             conn = psycopg2.connect(db_url)
             cur = conn.cursor(cursor_factory=RealDictCursor)
