@@ -114,15 +114,14 @@ class GetSingleCart(Resource):
                 auth_token = authentication_header.split(" ")[1]
                 identity = User.decode_auth_token(auth_token)
                 seller = identity['sub']
-                cart_item = Cart.get_single_cart_item(self, carts_id)
-                price = cart_item['price']
+                price = find_product['price']
                 total = int(price)*int(quantity)
-                u_product = Cart(product_name, quantity, total, seller)
-                updated_product = u_product.update_cart_item(carts_id)
+                product_to_update = Cart(product_name, quantity, total, seller)
+                updated_cart_item = product_to_update.update_cart_item(carts_id, product_name)
                 return make_response(jsonify({
                     'status': 'ok',
                     'message': 'Cart item edited successfully',
-                    'product': updated_product
+                    'cart_item': updated_cart_item
                 }), 201)  
 
             return make_response(jsonify({
@@ -132,15 +131,20 @@ class GetSingleCart(Resource):
     @api.doc(security='apikey')
     @token_required
     def delete(self, carts_id):
+        args = parser.parse_args()
+        product_name = args['product_name']
+        quantity = args['quantity']
         cart = Cart.get_single_cart_item(self, carts_id)
-        if cart:
-            Cart.delete_cart_item(self, carts_id)
-            return make_response(jsonify({
-                'status': 'ok',
-                'message': 'Cart item deleted successfully'
-            }))
-        else:
-            return {'message': 'Item does not exist'}
+        print(cart)
+        if "message" in cart:
+            return cart
+        Cart.update_product_quantity(self, product_name, quantity)
+        Cart.delete_cart_item(self, carts_id)
+        return make_response(jsonify({
+            'status': 'ok',
+            'message': 'Cart item deleted successfully'
+        }))
+        
 
 @api.route('/<seller>')
 class GetCartItemsBySeller(Resource):

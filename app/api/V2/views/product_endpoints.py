@@ -51,7 +51,7 @@ class ProductEndpoint(Resource):
         elif int(price) < 1:
             return {'message':'Price cannot be less than 0'},406
         
-        find_product = Product.get_product_by_name(self, product_name, quantity)
+        find_product = Product.get_product_by_name(product_name)
         if find_product:
             return make_response(jsonify({
                 'message': 'product exists, you can edit it.'
@@ -116,7 +116,7 @@ class GetSingleProduct(Resource):
         reorder_level = args['reorder_level']
         price = args['price']
 
-        find_product = Product.get_product_by_name(self, product_name, quantity)
+        find_product = Product.get_product_by_name(product_name)
         if find_product:
             return make_response(jsonify({
                 'message': 'product name exists, you can edit it.'

@@ -13,13 +13,13 @@ class Cart():
 
     def create_sale(self):
         """Method to create a new sale into list"""
-        sales_item = dict(
+        cart_item = dict(
             product_name = self.product_name,
             quantity = self.quantity,
             total = self.total,
             seller = self.seller
         ) 
-        product = Product.get_product_by_name(self.product_name)
+        product = self.get_product_by_name(self.product_name)
         if product:
             qty = product['quantity']
             rem_quantity = int(qty) - int(self.quantity) 
@@ -40,7 +40,7 @@ class Cart():
             cur = conn.cursor(cursor_factory=RealDictCursor)
             cur.execute(update_query, (rem_quantity, self.product_name))
             conn.commit()
-            return sales_item
+            return cart_item
 
     """method to fetch for a single cart item by id"""
     def get_single_cart_item (self, carts_id):
@@ -51,7 +51,7 @@ class Cart():
         cart_item = cur.fetchone()
         if cart_item:
             return cart_item
-        return {"message": "There is no sale record found"}
+        return {"message": "There is no item found"}
 
     """method to fetch cart itens by sellers"""
     def get_all_cart_items(self, seller):
@@ -66,10 +66,29 @@ class Cart():
         if carts:
             return carts
         return {"message": "There is no sales record for this seller"}
+
+    def get_product_by_name(self, product_name):
+        """Method to get a single product by name"""
+        query = """
+                SELECT * FROM products 
+                WHERE product_name=%s; 
+                """
+        conn = psycopg2.connect(db_url)
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(query,(product_name,))
+        product = cur.fetchone()
+        if product:
+            return product
         
 
-    def update_cart_item(self, carts_id):
-        cart_item = self.get_single_cart_item(carts_id)
+    def update_cart_item(self, carts_id, product_name):
+        updated_item = dict(
+            product_name = self.product_name,
+            quantity = self.quantity,
+            total = self.total,
+            seller = self.seller
+        ) 
+        cart_item = self.get_product_by_name(product_name)
         if cart_item:
             qty = cart_item['quantity']
             new_qty = int(qty) - int(self.quantity)
@@ -78,19 +97,21 @@ class Cart():
             """Method to get a single product by name"""
             query = """
                     UPDATE carts SET 
-                    product_name=%s;
-                    quantity=%s;
-                    total=%s;
-                    seller=%s;
+                    quantity=%s,
+                    total=%s
                     WHERE carts_id=%s; 
                     """
             conn = psycopg2.connect(db_url)
             cur = conn.cursor(cursor_factory=RealDictCursor)
-            cur.execute(query,(self.product_name, new_qty, new_price, self.seller, carts_id))
-            updated_cart_item = cur.fetchone()
-            if updated_cart_item:
-                return updated_cart_item
-
+            cur.execute(query,(new_qty, new_price, carts_id))
+            conn.commit()
+            update_query = """UPDATE products SET quantity=%sWHERE product_name=%s"""
+            conn = psycopg2.connect(db_url)
+            cur = conn.cursor(cursor_factory=RealDictCursor)
+            cur.execute(update_query, (new_qty, product_name))
+            conn.commit()
+            return updated_item
+    
     def delete_cart_item(self, carts_id):
         delete_query = """
                         DELETE FROM carts WHERE carts_id = %s
@@ -99,34 +120,30 @@ class Cart():
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute(delete_query,(carts_id,))
         conn.commit()
-        cart_item = Cart.get_single_cart_item(self, carts_id)
-        if cart_item:
-            qty = cart_item['quantity']
-            new_qty = int(qty) + int(self.quantity)
-            price = cart_item['price']
-            new_price = int(price)*int(self.quantity)
-            query = """
-                    UPDATE carts SET 
-                    product_name=%s;
-                    quantity=%s;
-                    total=%s;
-                    seller=%s;
-                    WHERE carts_id=%s; 
+
+    def update_product_quantity(self, product_name, quantity):
+        product = Product.get_product_by_name(product_name)
+        if product:
+            qty = product['quantity']
+            rollback_qty = int(quantity)
+            new_qty = int(qty) + int(rollback_qty)
+            query = """UPDATE products SET quantity=%s
+                    WHERE product_name=%s; 
                     """
             conn = psycopg2.connect(db_url)
             cur = conn.cursor(cursor_factory=RealDictCursor)
-            cur.execute(query,(self.product_name, new_qty, new_price, self.seller, carts_id))
+            cur.execute(query,(new_qty, product_name))
+            conn.commit()
         else:
             return {'message': 'Product does not exist'}
 
 
     def delete_cart(self, seller):
-        cart_items = self.get_all_cart_items(seller)
-        for items in range(len(cart_items)):
-            cart_id = cart_items[items]['carts_id']
-            self.delete_cart_item(cart_id)
-            conn = psycopg2.connect(db_url)
-            conn.commit()
-            cur = conn.cursor(cursor_factory=RealDictCursor)
-            cur.execute("ALTER SEQUENCE carts_id_seq RESTART WITH 1")
-            conn.commit()
+        query = """
+                DELETE from carts WHERE seller=%s;
+                """
+        conn = psycopg2.connect(db_url)
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(query,(seller,))
+        cur.execute("""ALTER SEQUENCE carts_carts_id_seq RESTART WITH 1""")
+        conn.commit()
