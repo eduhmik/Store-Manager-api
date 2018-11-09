@@ -105,8 +105,6 @@ class Cart():
             cur = conn.cursor(cursor_factory=RealDictCursor)
             cur.execute(query,(new_qty, new_price, carts_id))
             conn.commit()
-            item = self.get_single_cart_item(carts_id)
-            self.update_product_quantity(product_name, item['quantity'])
             update_query = """UPDATE products SET quantity=%sWHERE product_name=%s"""
             conn = psycopg2.connect(db_url)
             cur = conn.cursor(cursor_factory=RealDictCursor)
@@ -141,11 +139,14 @@ class Cart():
 
 
     def delete_cart(self, seller):
+        cart_items = self.get_all_cart_items(seller)
+        for item in range(len(cart_items)):
+            cart_item_id = cart_items[item]['carts_id']
         query = """
-                DELETE from carts WHERE seller=%s;
+                DELETE from carts WHERE carts_id=%s;
                 """
         conn = psycopg2.connect(db_url)
         cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute(query,(seller,))
+        cur.execute(query,(cart_item_id,))
         cur.execute("""ALTER SEQUENCE carts_carts_id_seq RESTART WITH 1""")
         conn.commit()
