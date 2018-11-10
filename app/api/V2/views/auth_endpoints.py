@@ -87,8 +87,8 @@ registration_fields = api.model('Registration', {
 """user registration"""
 @api.route('')
 class UserRegistration(Resource):
-    @api.expect(registration_fields, validate=True)
     @admin_required
+    @api.expect(registration_fields, validate=True)
     def post(self):
         args = parser.parse_args()
         username = args['username']

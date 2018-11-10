@@ -17,7 +17,7 @@ parser.add_argument('quantity', help = 'This field cannot be blank', required = 
 parser.add_argument('total', help = 'This field cannot be blank', required = True)
 # parser.add_argument('seller', help = 'This field cannot be blank', required = True)
 
-cart_fields = api.model('Sale', {
+cart_fields = api.model('Cart', {
     'product_name' : fields.String,
     'quantity': fields.Integer,
     'total': fields.Integer
