@@ -14,16 +14,16 @@ parser.add_argument('quantity', help = 'This field cannot be blank', required = 
 parser.add_argument('reorder_level', help = 'This field cannot be blank', required = True)
 parser.add_argument('price', help = 'This field cannot be blank', required = True)
 
-
-@api.route('')
-class ProductEndpoint(Resource):
-    product_fields = api.model('Product', {
+product_fields = api.model('Product', {
     'product_name' : fields.String,
     'category': fields.String,
     'quantity': fields.Integer,
     'reorder_level': fields.Integer,
     'price': fields.Integer
 })
+
+@api.route('')
+class ProductEndpoint(Resource):
     @api.expect(product_fields)
     @api.doc(security='apikey')
     @admin_required

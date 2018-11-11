@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from .instance.config import app_config
 from .db_setup import DatabaseSetup
 
@@ -15,4 +16,5 @@ def create_app(config):
     app.config.from_object(app_config[config])
     app.url_map.strict_slashes = False
     app.config['testing'] = True
+    CORS(app)
     return app

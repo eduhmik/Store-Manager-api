@@ -14,7 +14,7 @@ class DatabaseSetup:
     """Initialize a db connection"""
     def __init__(self, config_name):
         self.db_url = db_url
-        self.db_connection = psycopg2.connect(dsn=self.db_url)
+        self.db_connection = psycopg2.connect(self.db_url)
 
     def create_tables(self):
         db_connection = self.db_connection
@@ -28,10 +28,11 @@ class DatabaseSetup:
         table1="""DROP TABLE IF EXISTS users CASCADE"""
         table2="""DROP TABLE IF EXISTS products CASCADE"""
         table3="""DROP TABLE IF EXISTS sales CASCADE"""
+        table4="""DROP TABLE IF EXISTS revoke_tokens CASCADE"""
         
         db_connection = self.db_connection
         cursor = self.db_connection.cursor()
-        queries=[table1,table2,table3]
+        queries=[table1,table2,table3, table4]
         for query in queries:
             cursor.execute(query)
         db_connection.commit()
@@ -41,21 +42,19 @@ class DatabaseSetup:
         db_connection = self.db_connection
         cursor = self.db_connection.cursor()
         pwd = User.generate_hash('1234')
-        # stored_user_query = """
-        #             SELECT * from users WHERE username=%s
-        #             """
-        # cursor.execute(stored_user_query,('Eduhmik',))
-        # admin=cursor.fetchone()
-        # if not admin:
-        query = """
-        INSERT INTO users(username, email, phone, role, password)
-        VALUES(%s,%s,%s,%s,%s)
-        """
+        stored_user_query = """SELECT * from users WHERE username=%s"""
+        cursor.execute(stored_user_query,('Eduhmik',))
+        admin=cursor.fetchone()
+        if not admin:
+            query = """
+            INSERT INTO users(username, email, phone, role, password)
+            VALUES(%s,%s,%s,%s,%s)
+            """
 
-        cursor.execute(query, ('Eduhmik', 'edwinkimaita78@gmail.com', 
-                                '0718433329','admin', pwd))
-                            
-        db_connection.commit()
+            cursor.execute(query, ('Eduhmik', 'edwinkimaita78@gmail.com', 
+                                    '0718433329','admin', pwd))
+                                
+            db_connection.commit()
 
     def cursor(self):
         '''Holds temporal data being executed from or to the database'''
@@ -107,5 +106,15 @@ class DatabaseSetup:
         )
         """
 
-        queries = [query, query2, query3, query4]
+        query5 = """CREATE TABLE IF NOT EXISTS carts(
+            carts_id            SERIAL PRIMARY KEY,
+            product_name        VARCHAR(50)     NOT NULL,
+            quantity            INT     NOT NULL,
+            total               REAL     NOT NULL,
+            seller              VARCHAR(30)     NOT NULL,
+            created_on timestamp with time zone DEFAULT ('now'::text)::date NOT NULL  
+        )
+        """
+
+        queries = [query, query2, query3, query4, query5]
         return queries

@@ -17,28 +17,42 @@ class Sales():
             quantity = self.quantity,
             total = self.total,
             seller = self.seller
-        ) 
-        product = self.get_product_by_name(self.product_name)
-        if product:
-            qty = product['quantity']
-            print(qty)
-            rem_quantity = int(qty) - int(self.quantity) 
-            print(rem_quantity)
-            """Adding the sale into sales db"""   
-            query = """
-                    INSERT INTO sales(product_name, quantity, total, seller)
-                    VALUES(%s,%s,%s,%s);
+        )
+        cart_query ="""
+                    SELECT * FROM carts where seller=%s
                     """
-            update_query = """UPDATE products SET quantity=%sWHERE product_name=%s"""
-            conn = psycopg2.connect(db_url)
-            cur = conn.cursor(cursor_factory=RealDictCursor)
-            cur.execute(query, (self.product_name, self.quantity, self.total, self.seller))
-            conn.commit()
-            conn = psycopg2.connect(db_url)
-            cur = conn.cursor(cursor_factory=RealDictCursor)
-            cur.execute(update_query, (rem_quantity, self.product_name))
-            conn.commit()
-            return sales_item
+        conn = psycopg2.connect(db_url)
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(cart_query, (self.seller,))
+        sales = cur.fetchall()
+        conn.commit()
+        if "message" in  sales:
+            return {"message": "The cart is currently empty. Add items to cart to make a sale"}
+        for item in range(len(sales)):
+            product_name = sales[item]['product_name']
+            quantity = sales[item]['quantity']
+            total = sales[item]['total']
+            seller = sales[item]['seller']
+        
+        """Adding the sale into sales db"""   
+        query = """
+                INSERT INTO sales(product_name, quantity, total, seller)
+                VALUES(%s,%s,%s,%s);
+                """
+        conn = psycopg2.connect(db_url)
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(query, (product_name, quantity, total, seller))
+        conn.commit()
+        delete_cart =   """
+                        DELETE FROM carts WHERE seller=%s;
+                        """
+        conn = psycopg2.connect(db_url)
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(delete_cart, (seller,))
+        conn.commit()
+        if delete_cart:
+            return {'message': 'Cart has been checked out'}
+        return sales
 
     """method to fetch for all sales records"""
     def get_all_sales (self):
@@ -71,37 +85,7 @@ class Sales():
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute(query,(seller,))
         sales = cur.fetchall()
-        print(sales)
         if sales:
             return sales
         return {"message": "There is no sales record for this seller"}
         
-
-    def get_product_by_name(self, product_name):
-        """Method to get a single product by name"""
-        query = """
-                SELECT * FROM products 
-                WHERE product_name=%s; 
-                """
-        conn = psycopg2.connect(db_url)
-        cur = conn.cursor(cursor_factory=RealDictCursor)
-        cur.execute(query,(product_name,))
-        product = cur.fetchone()
-        if product:
-            return product
-           
-    # @staticmethod
-    # def update_qty_after_sale(quantity, product_name):
-    #     update_query = """
-    #                     UPDATE products 
-    #                     SET quantity = %s
-    #                     WHERE product_name = %s;
-    #                 """
-    #     conn = psycopg2.connect(db_url)
-    #     cur = conn.cursor(cursor_factory=RealDictCursor)
-    #     cur.execute(update_query, (quantity, product_name))
-        # new_product_stock = cur.fetchone()
-        # print(new_product_stock)
-        # if new_product_stock:
-        #     return new_product_stock
-        # return {'message': 'something happened'}

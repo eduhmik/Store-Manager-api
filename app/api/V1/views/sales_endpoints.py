@@ -16,14 +16,14 @@ parser.add_argument('quantity', help = 'This field cannot be blank', required = 
 parser.add_argument('total', help = 'This field cannot be blank', required = True)
 parser.add_argument('seller', help = 'This field cannot be blank', required = True)
 
-@api.route('')
-class SalesEndpoint(Resource):
-    sales_fields = api.model('Sale', {
+sales_fields = api.model('Sale', {
     'product_name' : fields.String,
     'quantity': fields.Integer,
     'total': fields.Integer,
     'seller': fields.String
 })
+@api.route('')
+class SalesEndpoint(Resource):
     @api.expect(sales_fields)
     @api.doc(security='apikey')
     @token_required

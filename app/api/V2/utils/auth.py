@@ -23,14 +23,18 @@ def admin_required(f):
                     }), 401)
             try:        
                 identity = User.decode_auth_token(auth_token)
+                print(identity)
                 
                 if identity == 'Invalid token. Please log in again.':
                     return make_response(jsonify({
                         'status': 'failed',
                         'message': 'Invalid token. Please log in again.'
                     }), 401)
-
-                if identity['role'] == 'attendant':
+                
+                elif "message" in identity:
+                    return identity
+                    
+                elif identity['role'] != 'admin':
                     return make_response(jsonify({
                         'status': 'failed',
                         'message': 'You are not an admin'
@@ -69,6 +73,9 @@ def token_required(j):
                         'status': 'failed',
                         'message': 'Invalid token. Please log in again.'
                     }), 401)
+
+                elif "message" in identity == 'Signature expired. Please log in again.':
+                    return identity
             except Exception as e:
                 return e
         else:

@@ -48,6 +48,21 @@ class User():
         if user:
             return user
         return {"message": "There are no records found"}
+
+    @staticmethod
+    def get_user_by_username(username):
+        """Retrieve user details by username"""
+        query = """
+                SELECT * FROM users 
+                WHERE username=%s; 
+                """
+        conn = psycopg2.connect(db_url)
+        cur = conn.cursor(cursor_factory=RealDictCursor)
+        cur.execute(query,(username,))
+        user = cur.fetchone()
+        if user:
+            return user
+        return {"message": "There are no records found"}
         
 
     @staticmethod

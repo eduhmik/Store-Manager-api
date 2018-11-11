@@ -3,6 +3,7 @@ from flask_restplus import Resource, reqparse, Api, Namespace, fields
 from ..models.product_model import Product
 from ..models.user_model import User
 from app.api.V2.utils.auth import admin_required, token_required
+from app.api.V2.utils.validator import Verify
 
 api = Namespace('Product_endpoints', description='A collection of endpoints for the product model; includes get and post endpoints', 
 path='api/v2/products')
@@ -23,7 +24,7 @@ product_fields = api.model('Product', {
 })
 @api.route('')
 class ProductEndpoint(Resource):
-    @api.expect(product_fields)
+    @api.expect(product_fields, validate=True)
     @api.doc(security='apikey')
     @admin_required
     def post(self):
@@ -35,7 +36,22 @@ class ProductEndpoint(Resource):
         reorder_level = args['reorder_level']
         price = args['price']
 
-        find_product = Product.get_product_by_name(self, product_name, quantity)
+        payload= [product_name, category, quantity, reorder_level, price]
+
+        if payload is False:
+            return {'message':'Payload is invalid'},406
+        elif Verify.is_empty(self, payload) is True:
+            return {'message':'Required field is empty'},406
+        elif Verify.is_whitespace(self, payload) is True:
+            return {'message':'Required field contains only white spaces'},406
+        elif int(quantity) < 1:
+            return {'message':'Product quantity cannot be less than 1'},406
+        elif int(reorder_level) < 1:
+            return {'message':'Product reorder level cannot be less than 1'},406
+        elif int(price) < 1:
+            return {'message':'Price cannot be less than 0'},406
+        
+        find_product = Product.get_product_by_name(product_name)
         if find_product:
             return make_response(jsonify({
                 'message': 'product exists, you can edit it.'
@@ -100,7 +116,7 @@ class GetSingleProduct(Resource):
         reorder_level = args['reorder_level']
         price = args['price']
 
-        find_product = Product.get_product_by_name(self, product_name, quantity)
+        find_product = Product.get_product_by_name(product_name)
         if find_product:
             return make_response(jsonify({
                 'message': 'product name exists, you can edit it.'

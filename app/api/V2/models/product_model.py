@@ -1,9 +1,10 @@
 from psycopg2.extras import RealDictCursor
 import psycopg2
+from app.api.V2.utils.validator import Verify
 from app.db_setup import db_url
 
 """ product model class and various functions"""
-class Product():
+class Product(Verify):
     """ Initializing the constructor"""
     def __init__(self, product_name, category, quantity, reoder_level, price):
         self.product_name = product_name
@@ -11,6 +12,24 @@ class Product():
         self.quantity = quantity
         self.reorder_level = reoder_level
         self.price = price
+
+    def validate_input(self):
+        strings=self.product_name, self.category, self.quantity, self.reorder_level, self.price
+        payload = self.is_product_payload(strings)
+        if payload is False:
+            return {'message':'Payload is invalid'},406
+        elif self.is_empty(strings) is True:
+            return {'message':'Data set is empty'},406
+        elif self.is_whitespace(strings) is True:
+            return {'message':'Data set contains only white space'},406
+        elif self.quantity < 1:
+            return {'message':'Product quantity cannot be less than 1'},406
+        elif self.reorder_level < 1:
+            return {'message':'Product reorder level cannot be less than 1'},406
+        elif self.price < 1:
+            return {'message':'Price cannot be less than 0'},406
+        else:
+            return 1
 
     def create_product(self):
         """Method to create a new product into db"""
@@ -63,8 +82,8 @@ class Product():
         if product:
             return product
         return {"message": "There is no product found"}
-
-    def get_product_by_name(self, product_name, quantity):
+    @staticmethod
+    def get_product_by_name(product_name):
         """Method to get a single product by name"""
         query = """
                 SELECT * FROM products 
