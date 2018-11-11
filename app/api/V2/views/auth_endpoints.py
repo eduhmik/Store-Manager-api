@@ -7,10 +7,10 @@ from app.api.V2.utils.auth import admin_required
 import re
 
 
-api = Namespace('Register Endpoint', description='A collection of register endpoints for the user model')
-ns = Namespace('Users Endpoints', description='Users endpoints to fetch all users and delete them')
+api = Namespace('Register_Endpoint', description='A collection of register endpoints for the user model')
+ns = Namespace('Users_Endpoints', description='Users endpoints to fetch all users and delete them')
 ns2 = Namespace('Login_endpoint', description='Login endpoints for the user model')
-ns3 = Namespace('Logout Endpoint', description='An endpoint to logout')
+ns3 = Namespace('Logout_Endpoint', description='An endpoint to logout')
 
 parser = reqparse.RequestParser()
 parser.add_argument('username', help = 'This field cannot be blank')
@@ -23,6 +23,7 @@ login_fields = api.model('Login', {
     'email': fields.String,
     'password': fields.String
 })
+
 
 """user login"""
 @ns2.route('')
@@ -76,7 +77,6 @@ class UserLogin(Resource):
                 'status' : 'failed'
             }), 500)
 
-
 registration_fields = api.model('Registration', {
     'username' : fields.String,
     'email': fields.String,
@@ -107,17 +107,10 @@ class UserRegistration(Resource):
                 'message': 'The role can only be an admin or attendant.'
             }))
         
-        if len(password) < 6:
-            return make_response(jsonify({"message": "The password is too short,minimum length is 6"}), 400)
         if Password(password).is_valid(password) == 'invalid':
-            return make_response(jsonify({
-            'message': ['The password you entered is invalid password should contain',
-                    {'a lowercase character':'an uppercase character', 
-                        'a digit': 'a special character e.g $@*', 
-                        'length':'length not less than 6 or above 13'
-                    }
-            ]
-}))
+            return {'message':'Password should be atleast 6 characters and \
+contains [A-Z],[a-z],[0-9] and either [$, #, @, *, &, !, %]'}
+
 
         payload= [username, email, phone, role, password]
 
