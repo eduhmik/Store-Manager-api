@@ -107,17 +107,9 @@ class UserRegistration(Resource):
                 'message': 'The role can only be an admin or attendant.'
             }))
         
-        if len(password) < 6:
-            return make_response(jsonify({"message": "The password is too short,minimum length is 6"}), 400)
         if Password(password).is_valid(password) == 'invalid':
-            return make_response(jsonify({
-            'message': ['The password you entered is invalid password should contain',
-                    {'a lowercase character':'an uppercase character', 
-                        'a digit': 'a special character e.g $@*', 
-                        'length':'length not less than 6 or above 13'
-                    }
-            ]
-}))
+            return {'message':'Password should be atleast 6 characters and \
+contains [A-Z],[a-z],[0-9] and either [$, #, @, *, &, !, %]'}
 
         payload= [username, email, phone, role, password]
 
